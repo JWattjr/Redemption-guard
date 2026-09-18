@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "redemption-guard",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start", "--workspace", "frontend", "--", "-p", "3217"],
+      "port": 3217
+    }
+  ]
+}

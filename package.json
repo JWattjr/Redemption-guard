@@ -1,0 +1,36 @@
+{
+  "name": "redemption-guard",
+  "private": true,
+  "type": "module",
+  "description": "Redemption Guard: GenLayer consensus-gated exposure authorization for stablecoins (Studio Next).",
+  "workspaces": [
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=20.18"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace frontend",
+    "build": "npm run build --workspace frontend",
+    "lint": "npm run lint --workspace frontend",
+    "typecheck": "npm run typecheck --workspace frontend && tsc -p tsconfig.scripts.json",
+    "contract:lint": "genvm-lint check contracts/redemption_guard.py",
+    "test:direct": "python -m pytest tests/direct -q",
+    "test:studio": "tsx scripts/smoke-studio.ts",
+    "deploy": "tsx scripts/deploy.ts",
+    "seed": "tsx scripts/seed-demo.ts",
+    "deploy:demo": "tsx scripts/deploy.ts && tsx scripts/seed-demo.ts",
+    "verify:proof": "tsx scripts/verify-proof.ts",
+    "test:ui": "tsx scripts/e2e-ui.ts",
+    "test:responsive": "tsx scripts/screenshots.ts"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "dotenv": "17.2.3",
+    "genlayer": "0.40.0-rc.3",
+    "genlayer-js": "2.0.0-rc.1",
+    "playwright-core": "1.56.1",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3"
+  }
+}

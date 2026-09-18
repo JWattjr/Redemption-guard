@@ -1,0 +1,7 @@
+{
+  "contractAddress": "0xf0c2BeA9ccb6ff576a775baED471B02Cbf513862",
+  "chainId": 61997,
+  "deployedAt": "2026-09-18T16:15:25.067Z",
+  "deployTx": "0xc0f2cad746f53518c520e95a8d5be13d27c0a900400c3277f99b64eefe512a8a",
+  "fixtureBaseUrl": "https://redemption-guard.vercel.app"
+}
