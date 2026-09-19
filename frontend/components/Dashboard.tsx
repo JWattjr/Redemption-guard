@@ -303,7 +303,7 @@ export default function Dashboard() {
           </section>
 
           <div className="actions">
-            <section className="panel" aria-labelledby="assess-title">
+            <section className="panel panel--action panel--assess" aria-labelledby="assess-title">
               <div className="panel__head">
                 <h2 id="assess-title">1 · Submit evidence</h2>
                 <AssetPicker
@@ -386,7 +386,7 @@ export default function Dashboard() {
               {assessDisabledReason && <p className="small muted right">{assessDisabledReason}</p>}
             </section>
 
-            <section className="panel" aria-labelledby="exposure-title">
+            <section className="panel panel--action panel--exposure" aria-labelledby="exposure-title">
               <div className="panel__head">
                 <h2 id="exposure-title">2 · Request exposure</h2>
                 <AssetPicker

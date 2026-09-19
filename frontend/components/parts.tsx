@@ -229,7 +229,7 @@ export function Activity({ assessments, exposures }: { assessments: Assessment[]
         <ol className="activity">
           {items.slice(0, 12).map((row) =>
             row.kind === "assessment" ? (
-              <li key={`a${row.item.id}`} className="activity__row">
+              <li key={`a${row.item.id}`} className="activity__row activity__row--assessment">
                 <span className="activity__kind">Assessment #{row.item.id}</span>
                 <span className="activity__what">
                   <strong>{row.item.asset_id}</strong> <StatusBadge status={row.item.status} />
@@ -237,7 +237,7 @@ export function Activity({ assessments, exposures }: { assessments: Assessment[]
                 <span className="activity__when">{when(row.at)}</span>
               </li>
             ) : (
-              <li key={`e${row.item.id}`} className="activity__row">
+              <li key={`e${row.item.id}`} className="activity__row activity__row--exposure">
                 <span className="activity__kind">Exposure #{row.item.id}</span>
                 <span className="activity__what">
                   <strong>{row.item.asset_id}</strong>{" "}
