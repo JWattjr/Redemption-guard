@@ -86,6 +86,14 @@ def html_response(name: str) -> dict:
     }
 
 
+def set_tx_time(vm, timestamp: str) -> None:
+    """Warp the harness and refresh v0.3's raw message timestamp."""
+    vm.warp(timestamp)
+    import genlayer.message as message
+
+    message.raw["datetime"] = timestamp
+
+
 @pytest.fixture
 def guard(direct_vm, direct_deploy, direct_owner):
     direct_vm.sender = direct_owner

@@ -6,7 +6,7 @@ A treasury can only take new exposure to a stablecoin after independent GenLayer
 
 ## Product
 
-Redemption Guard monitors two stablecoins. Anyone can submit 1–3 HTTPS evidence URLs for an asset. GenLayer validators fetch those pages themselves, apply a frozen treasury policy, and must agree on exactly one status: `ELIGIBLE`, `RESTRICTED`, or `INSUFFICIENT_EVIDENCE`. The agreed status is written on-chain, and a deterministic `request_exposure` method records new exposure **only** when that latest status is `ELIGIBLE`. Anything else, including no assessment at all, reverts.
+Redemption Guard monitors two stablecoins. Anyone can submit 1–3 HTTPS evidence URLs for an asset. GenLayer validators fetch those pages themselves, apply a frozen treasury policy, and must agree on exactly one status: `ELIGIBLE`, `RESTRICTED`, or `INSUFFICIENT_EVIDENCE`. The agreed status is written on-chain, and a deterministic `request_exposure` method records new exposure **only** when that latest status is `ELIGIBLE` and any recovery cooldown has elapsed. A new `ELIGIBLE` result after `RESTRICTED` is visible immediately but reopens the gate one hour later. Anything else, including no assessment at all, reverts.
 
 It is an authorization prototype. There are no tokens, custody, swaps, or price feeds, and no database, accounts, or backend.
 
@@ -22,19 +22,19 @@ It is an authorization prototype. There are no tokens, custody, swaps, or price 
 | Layer | Responsibility |
 |---|---|
 | **Frontend** | Wallet, URL entry, Transaction Kit fee review and signing, lifecycle display, reading back contract state to confirm outcomes. It sends **only URLs** and never a conclusion. |
-| **Deterministic contract logic** | Owner-only registration of at most 2 assets with their issuer domains; validation of URLs (1–3, `https://`, ≤ 300 chars, public host, unique), amounts (positive integers), and IDs; the rule that a decisive status must cite a usable source on the registered issuer domain; persistence; the `ELIGIBLE`-only exposure gate. |
+| **Deterministic contract logic** | Owner-only registration of at most 2 assets with their issuer domains; validation of URLs (1–3, `https://`, ≤ 300 chars, public host, unique), amounts (positive integers), and IDs; the rule that a decisive status must cite a usable source on the registered issuer domain; persistence; the one-hour `RESTRICTED` → `ELIGIBLE` recovery cooldown; the exposure gate. |
 | **External evidence** | Issuer pages over public HTTPS. Validators fetch them directly; 4xx, oversized (> 1 MB), or non-text sources are unusable, and 5xx or network errors abort the transaction as `[TRANSIENT]`. |
 | **GenLayer judgment** | `gl.vm.run_nondet` leader/validator (GenVM v0.3's name for `run_nondet_unsafe`). The leader fetches and judges; each validator re-fetches, re-judges, and agrees only if its **status** matches. Prose may differ. LLM errors always disagree, forcing rotation. |
 
 ## The consequential state transition
 
-`assess_asset` → (consensus) → `latest_assessment[asset] = id` → `request_exposure` succeeds **iff** `assessments[id].status == "ELIGIBLE"`, otherwise reverts `[EXPECTED] EXPOSURE_BLOCKED: <asset> latest assessment #<id> is <status>`.
+`assess_asset` → (consensus) → `latest_assessment[asset] = id` → `request_exposure` succeeds **iff** `assessments[id].status == "ELIGIBLE"` and `gate_open_at` is not in the future, otherwise reverts `[EXPECTED] EXPOSURE_BLOCKED`.
 
 ## Live links
 
 - App: https://redemption-guard.vercel.app
-- Contract on GenLayer Studio Next (chain 61997): [`0xf0c2BeA9ccb6ff576a775baED471B02Cbf513862`](https://explorer-studio-dev.genlayer.com/address/0xf0c2BeA9ccb6ff576a775baED471B02Cbf513862)
-- Deploy tx: [`0xc0f2cad7…12a8a`](https://explorer-studio-dev.genlayer.com/tx/0xc0f2cad746f53518c520e95a8d5be13d27c0a900400c3277f99b64eefe512a8a)
+- Contract on GenLayer Studio Next (chain 61997): [`0x7D77A1742Ba479c1EEBE867CB1EAbCc1acF44231`](https://explorer-studio-dev.genlayer.com/address/0x7D77A1742Ba479c1EEBE867CB1EAbCc1acF44231)
+- Deploy tx: [`0xfffd01e8…61459`](https://explorer-studio-dev.genlayer.com/tx/0xfffd01e881d5b49fb3a12c68005dc3e184ec5ce061735d0938835bff1cc61459)
 - Synthetic reviewer fixtures (public HTTPS, fetched by validators):
   - Operational (NWUSD): https://redemption-guard.vercel.app/evidence/northwind-redemptions-operational.html
   - Suspended (HLUSD): https://redemption-guard.vercel.app/evidence/halcyon-redemptions-suspended.html
@@ -42,20 +42,20 @@ It is an authorization prototype. There are no tokens, custody, swaps, or price 
 
 ## Three proof transactions (Studio Next, all FINALIZED, 5 initial validators each)
 
-Produced by `npm run seed` on 2026-09-18 and re-verified from chain with `npm run verify:proof`.
+Produced by `npm run deploy:demo` on 2026-09-19 and re-verified from chain with `npm run verify:proof`.
 
 | Flow | Assessment tx (status) | Exposure tx (result) |
 |---|---|---|
-| **1. RESTRICTED → blocked** (HLUSD, suspension notice) | [`0xb14651cc…eeeda6`](https://explorer-studio-dev.genlayer.com/tx/0xb14651ccf41027d050b338779492b4ec9490272915996810808d3117fceeeda6) — `RESTRICTED`, `REDEMPTIONS_SUSPENDED`, 3 agree / 5 | [`0xbd69447f…008beb`](https://explorer-studio-dev.genlayer.com/tx/0xbd69447f39d443694cbe38cc5ebd1ce5ef9b167aa94e06c79250e23e7a008beb) — `FINISHED_WITH_ERROR`: `[EXPECTED] EXPOSURE_BLOCKED: HLUSD latest assessment #1 is RESTRICTED` |
-| **2. INSUFFICIENT_EVIDENCE → blocked** (HLUSD, ambiguous update) | [`0x21eca7d4…63b80f`](https://explorer-studio-dev.genlayer.com/tx/0x21eca7d420ed24e8c82dcbc2514f578ed489fe19388ed948a250ec82af63b80f) — `INSUFFICIENT_EVIDENCE`, `SOURCE_AMBIGUOUS` + `NO_REDEMPTION_INFORMATION`, 3 agree / 5 | [`0xc9bf0f15…6d004b9`](https://explorer-studio-dev.genlayer.com/tx/0xc9bf0f15a697da3ee9211ac3797f65e03386e54f8562dd0be1e3df8e86d004b9) — `FINISHED_WITH_ERROR`: `…latest assessment #2 is INSUFFICIENT_EVIDENCE` |
-| **3. ELIGIBLE → permitted** (NWUSD, operational notice) | [`0x39764b1b…441c3d`](https://explorer-studio-dev.genlayer.com/tx/0x39764b1b659ff611c1941b7a61048cf0530943d726dbc96e17d76083fa441c3d) — `ELIGIBLE`, `REDEMPTIONS_OPERATIONAL`, 3 agree / 5 | [`0x3c9938eb…eb65`](https://explorer-studio-dev.genlayer.com/tx/0x3c9938eb8a39a81d7cb0acca2d962eac2c30171b572d0bbefa9430e7bee0eb65) — `FINISHED_WITH_RETURN`: exposure #1, 250,000 units, count 0 → 1 |
+| **1. RESTRICTED → blocked** (HLUSD, suspension notice) | [`0x3721189d…04933f`](https://explorer-studio-dev.genlayer.com/tx/0x3721189d542d0e518f8d010c0b9564439d97493bec0febd700dbdc027b04933f) — `RESTRICTED`, `REDEMPTIONS_SUSPENDED`, 3 agree / 5 | [`0xd4c00b65…4503d2`](https://explorer-studio-dev.genlayer.com/tx/0xd4c00b658764014df3cc0f81992d6e2ac6e8289ef21c4035e6e49678df4503d2) — `FINISHED_WITH_ERROR`: `[EXPECTED] EXPOSURE_BLOCKED: HLUSD latest assessment #1 is RESTRICTED` |
+| **2. INSUFFICIENT_EVIDENCE → blocked** (HLUSD, ambiguous update) | [`0xe9f707ee…584be1`](https://explorer-studio-dev.genlayer.com/tx/0xe9f707ee943c63470d22a802d0259110ee7bcfa9a7e5a04efb675a0a57584be1) — `INSUFFICIENT_EVIDENCE`, `SOURCE_AMBIGUOUS` + `NO_REDEMPTION_INFORMATION`, 3 agree / 5 | [`0xd9292430…4512e`](https://explorer-studio-dev.genlayer.com/tx/0xd9292430bb74717867e1e7df5ca3c5358273f37882bd0cf139d697b75fd4512e) — `FINISHED_WITH_ERROR`: `…latest assessment #2 is INSUFFICIENT_EVIDENCE` |
+| **3. ELIGIBLE → permitted** (NWUSD, operational notice) | [`0x712c3cfe…f2aa9`](https://explorer-studio-dev.genlayer.com/tx/0x712c3cfeba7ec3a81a0cc70d0f5db168cbb90464272d929479fc5b9de53f2aa9) — `ELIGIBLE`, `REDEMPTIONS_OPERATIONAL`, 3 agree / 5 | [`0xa18a7ebf…619e5`](https://explorer-studio-dev.genlayer.com/tx/0xa18a7ebf173be29cd2a8fd88899ee78cf0d2eed7beb5b636a434c8ad856191e5) — `FINISHED_WITH_RETURN`: exposure #1, 250,000 units, count 0 → 1 |
 
 For each flow, the resulting state was read back (latest assessment status and exposure count). Full records: `deployments/demo-proof.json`.
 
-Additional genuine transactions against the same contract:
+Additional genuine transactions against the same deployment:
 
-- **Browser E2E through the real UI and Transaction Kit** (`npm run test:ui`, injected test wallet): blocked HLUSD request [`0x99292da7…3083c`](https://explorer-studio-dev.genlayer.com/tx/0x99292da77060a35ef6b1e882055e13f58f37c2990dba0bbdf2e68a7977a3083c), NWUSD assessment → `ELIGIBLE` #4 [`0x0f32e6a8…e4981`](https://explorer-studio-dev.genlayer.com/tx/0x0f32e6a8da716e11465abde0ac6b56fe96fb807293e94100e651ac989a5e4981), permitted 75,000-unit exposure [`0xc4299d20…f068c2`](https://explorer-studio-dev.genlayer.com/tx/0xc4299d20b939fe605bf6eea7be7f2a5250b7e324221bfa7fdadecd0492f068c2).
-- **Smoke test** (`npm run test:studio`): HLUSD re-assessed → `INSUFFICIENT_EVIDENCE` #5 [`0xb888207c…ce6076`](https://explorer-studio-dev.genlayer.com/tx/0xb888207cda7c1847142891aff0eba9eddf71cf9339bebe7fe346ff8a3dce6076), then blocked exposure [`0x4eb8afdc…fa8b4`](https://explorer-studio-dev.genlayer.com/tx/0x4eb8afdc6a6abed3e1ba802cacea9a764ec630d88da9d1dc876241d7140fa8b4).
+- **Smoke test** (`npm run test:studio`): HLUSD re-assessed → `INSUFFICIENT_EVIDENCE` #4 [`0x6e9be8a5…9e8498`](https://explorer-studio-dev.genlayer.com/tx/0x6e9be8a5e6a95834af10f8dd38ef48b3a7afcbd6069a38f1a5c9c762939e8498), then blocked exposure [`0x307eebe4…99006`](https://explorer-studio-dev.genlayer.com/tx/0x307eebe432fd36deb022572b01ada4405b2b8229d838926ac43ee85a3bf99006). Both state checks passed.
+- **Browser E2E through the real UI and Transaction Kit** (`npm run test:ui`, injected throwaway wallet): blocked HLUSD request [`0x2b17a8c0…ee995`](https://explorer-studio-dev.genlayer.com/tx/0x2b17a8c007d130d23d04c82d761657009c54ffea5c6cf37d68860daf8ceee995), NWUSD assessment → `ELIGIBLE` #5 [`0xe64f92b3…c336a3`](https://explorer-studio-dev.genlayer.com/tx/0xe64f92b3ffc463bd3e6677980854542eb9dc92b18530ae476a49f0eeabc336a3), permitted 75,000-unit exposure [`0x53cf9ec6…f3b6f`](https://explorer-studio-dev.genlayer.com/tx/0x53cf9ec674986f43dfefcf3218e486479ee4e2e04eac299fb4eeb98ab47f3b6f). No page errors; all three state confirmations passed.
 
 An earlier deployment (`0xc013C164…2070`) ran the same three flows with the same outcomes before the aggregated `get_dashboard` view was added.
 
@@ -71,7 +71,7 @@ An earlier deployment (`0xc013C164…2070`) ran the same three flows with the sa
 
 - **Studio Next is a release-candidate network and may reset.** If it does, the contract address and proof links above stop resolving. See the reset steps below.
 - **Synthetic assets and fixtures.** NWUSD and HLUSD are fictional, and their "issuer domain" is the app's own domain, where the three labeled fixtures live. Live URLs are accepted, but evidence about any other asset is correctly judged `INSUFFICIENT_EVIDENCE` because it cannot be tied to these assets.
-- **Open assessment.** Anyone can trigger `assess_asset`, so a caller could submit only a favorable authoritative page and omit a newer suspension notice. The authoritative-domain rule, staleness window, and the requirement that validators re-read what is cited limit this, but a production version should gate who can assess, require a minimum source set, or add an appeal/dispute window.
++ **Open assessment.** Anyone can trigger `assess_asset`, so a caller could submit only a favorable authoritative page and omit a newer suspension notice. The authoritative-domain rule, staleness window, independent validator re-fetch, and one-hour recovery cooldown limit instant reopening, but a production version should gate who can assess, require a minimum source set, or add an appeal/dispute window.
 - **Domain-based authority.** Authority means a registered issuer hostname. It does not verify signatures, and a compromised issuer site would be trusted.
 - **LLM variance.** Borderline evidence can split validators. The design fails closed (no status recorded, gate unchanged), but it can cost a retry.
 - **UI results appear at "decided".** The dashboard shows results at `ACCEPTED` for responsiveness, labels them "not final", and confirms them through state reads. The explorer shows the eventual `FINALIZED`.

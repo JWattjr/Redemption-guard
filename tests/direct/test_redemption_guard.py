@@ -1,6 +1,6 @@
 import json
 
-from conftest import CONTRACT, HOST, URL_OPERATIONAL, URL_SUSPENDED, URL_UNCLEAR, html_response
+from conftest import CONTRACT, HOST, URL_OPERATIONAL, URL_SUSPENDED, URL_UNCLEAR, html_response, set_tx_time
 
 OPERATIONAL_LLM = json.dumps({
     "status": "ELIGIBLE",
@@ -149,7 +149,8 @@ def test_missing_assessment_blocks_exposure(guard, direct_vm):
 
 
 def test_latest_assessment_governs_exposure(guard, fixtures_online):
-    """ELIGIBLE -> exposure ok; a newer INSUFFICIENT assessment revokes it."""
+    """A restricted-to-eligible recovery stays closed through its cooldown."""
+    set_tx_time(fixtures_online, "2026-09-18T12:00:00Z")
     mock_all_llm(fixtures_online)
     assert guard.assess_asset("HLUSD", urls(URL_SUSPENDED)) == "RESTRICTED"
     fixtures_online.clear_mocks()
@@ -158,8 +159,18 @@ def test_latest_assessment_governs_exposure(guard, fixtures_online):
         "status": "ELIGIBLE", "reasoning": "Wrong asset evidence ok", "reason_codes": [],
         "supporting_urls": [URL_SUSPENDED],
     }))
+    set_tx_time(fixtures_online, "2026-09-18T12:30:00Z")
     assert guard.assess_asset("HLUSD", urls(URL_SUSPENDED)) == "ELIGIBLE"
+    latest = guard.get_latest_assessment("HLUSD")
+    assert latest["gate_open_at"] == "2026-09-18T13:30:00+00:00"
+    assert guard.get_asset("HLUSD")["gate_open"] is False
+    assert "HLUSD" not in guard.get_summary()["eligible_assets"]
+    with fixtures_online.expect_revert("cooldown until 2026-09-18T13:30:00+00:00"):
+        guard.request_exposure("HLUSD", 5)
+    set_tx_time(fixtures_online, "2026-09-18T13:30:00Z")
     assert guard.request_exposure("HLUSD", 5) == 1
+    assert guard.get_asset("HLUSD")["gate_open"] is True
+    assert "HLUSD" in guard.get_summary()["eligible_assets"]
     fixtures_online.clear_mocks()
     fixtures_online.mock_web(r".*", html_response("halcyon-status-unclear.html"))
     fixtures_online.mock_llm(r".*", UNCLEAR_LLM)
@@ -320,6 +331,7 @@ def test_policy_view(guard):
     assert policy["policy_id"] == "RG-TREASURY-REDEMPTION-v1"
     assert policy["text"].startswith("New exposure is eligible only when authoritative evidence")
     assert policy["statuses"] == ["ELIGIBLE", "RESTRICTED", "INSUFFICIENT_EVIDENCE"]
+    assert policy["restricted_to_eligible_cooldown_seconds"] == 3600
 
 
 def test_dashboard_aggregate_view(guard, fixtures_online):

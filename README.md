@@ -1,9 +1,9 @@
 # Redemption Guard
 
-**GenLayer validators read a stablecoin issuer's redemption evidence themselves, judge it against a frozen treasury policy, and must agree on one status. Only an agreed `ELIGIBLE` opens the exposure gate.**
+**GenLayer validators read a stablecoin issuer's redemption evidence themselves, judge it against a frozen treasury policy, and must agree on one status. Only an agreed `ELIGIBLE` opens the exposure gate; recovery from `RESTRICTED` has a one-hour cooldown.**
 
 - Live app: https://redemption-guard.vercel.app
-- Contract (Studio Next, chain 61997): [`0xf0c2BeA9ccb6ff576a775baED471B02Cbf513862`](https://explorer-studio-dev.genlayer.com/address/0xf0c2BeA9ccb6ff576a775baED471B02Cbf513862)
+- Contract (Studio Next, chain 61997): [`0x7D77A1742Ba479c1EEBE867CB1EAbCc1acF44231`](https://explorer-studio-dev.genlayer.com/address/0x7D77A1742Ba479c1EEBE867CB1EAbCc1acF44231)
 - Submission write-up: [PORTAL_SUBMISSION.md](PORTAL_SUBMISSION.md) · Design: [ARCHITECTURE.md](ARCHITECTURE.md)
 
 > Authorization prototype. Not financial advice. No tokens, custody, swaps, price feeds, database, accounts, or backend. NWUSD and HLUSD are fictional assets, and the three evidence pages are labeled synthetic reviewer fixtures.
@@ -16,7 +16,7 @@ Every assessment returns exactly one status under this frozen policy (stored as 
 
 | Status | `request_exposure` |
 |---|---|
-| `ELIGIBLE` | Recorded on-chain |
+| `ELIGIBLE` | Recorded on-chain when the gate is open; a recovery from `RESTRICTED` waits one hour |
 | `RESTRICTED` | Reverts `[EXPECTED] EXPOSURE_BLOCKED…` |
 | `INSUFFICIENT_EVIDENCE` | Reverts |
 | no assessment | Reverts |
@@ -105,3 +105,7 @@ The evidence fixtures must be reachable over public HTTPS before deploying. The 
 - Writes need explicit fees. The scripts use `estimateTransactionFeesForWrite` (simulation) and fall back to `estimateTransactionFees`. The UI uses Transaction Kit's fee review.
 - The RPC allows about 30 requests per minute per client. The dashboard makes one aggregated read (`get_dashboard`) every 30 s, pauses polling while a transaction is tracked, and spaces and retries its RPC calls. The scripts back off on rate limits.
 - `gen_dbg_traceTransaction` is not served, so revert reasons are decoded from `consensus_data.leader_receipt[0].result` (a result-code byte followed by the payload).
+
+## Recovery cooldown
+
+An assessment that moves an asset from `RESTRICTED` to `ELIGIBLE` is recorded immediately, but the deterministic exposure gate remains closed for one hour from that assessment's transaction timestamp. The assessment exposes the exact `gate_open_at` time, and `request_exposure` reverts with an `[EXPECTED] EXPOSURE_BLOCKED` reason until that time. This prevents a single favorable re-assessment from reopening exposure instantly after a suspension.

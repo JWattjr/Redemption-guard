@@ -18,6 +18,7 @@ export type Assessment = {
   policy_id: string;
   requested_by: string;
   assessed_at: string;
+  gate_open_at: string | null;
 };
 
 export type Asset = {
@@ -28,6 +29,8 @@ export type Asset = {
   registered_at: string;
   latest_assessment_id: number;
   latest_status: Status | "";
+  gate_open_at: string | null;
+  gate_open: boolean;
   approved_exposure_units: string;
 };
 
@@ -48,6 +51,7 @@ export type Policy = {
   max_assets: number;
   max_urls: number;
   stale_after_days: number;
+  restricted_to_eligible_cooldown_seconds: number;
 };
 
 export type Summary = {
@@ -160,6 +164,7 @@ export function isValidEvidenceUrl(value: string): string | null {
   try {
     const u = new URL(v);
     if (u.username || u.password) return "Credentials in URLs are not allowed";
+    if (u.port && u.port !== "443") return "Only the default HTTPS port is accepted";
     if (!/^([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/.test(u.hostname)) return "Use a public DNS hostname";
   } catch {
     return "Not a valid URL";

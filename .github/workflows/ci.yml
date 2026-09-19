@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned Python tooling
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
+
+      - name: Lint GenLayer contract
+        run: PYTHONIOENCODING=utf-8 genvm-lint check contracts/redemption_guard.py
+
+      - name: Run direct contract tests
+        run: python -m pytest tests/direct -q
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.18"
+          cache: npm
+
+      - name: Install pinned npm dependencies
+        run: npm ci
+
+      - name: Lint frontend
+        run: npm run lint
+
+      - name: Typecheck frontend and scripts
+        run: npm run typecheck
+
+      - name: Build frontend
+        run: npm run build

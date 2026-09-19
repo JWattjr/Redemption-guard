@@ -3,24 +3,24 @@
   "chainId": 61997,
   "rpcUrl": "https://studio-dev.genlayer.com/api",
   "explorerUrl": "https://explorer-studio-dev.genlayer.com",
-  "contractAddress": "0xf0c2BeA9ccb6ff576a775baED471B02Cbf513862",
+  "contractAddress": "0x7D77A1742Ba479c1EEBE867CB1EAbCc1acF44231",
   "deployTx": {
-    "hash": "0xc0f2cad746f53518c520e95a8d5be13d27c0a900400c3277f99b64eefe512a8a",
+    "hash": "0xfffd01e881d5b49fb3a12c68005dc3e184ec5ce061735d0938835bff1cc61459",
     "statusName": "ACCEPTED",
     "executionResultName": "FINISHED_WITH_RETURN",
     "successful": true,
-    "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xc0f2cad746f53518c520e95a8d5be13d27c0a900400c3277f99b64eefe512a8a",
+    "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xfffd01e881d5b49fb3a12c68005dc3e184ec5ce061735d0938835bff1cc61459",
     "validators": 5,
     "votes": {
+      "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "agree",
       "0x5cDf4BdDeEDa0e32ED596b94f69AcC0FbB57f264": "agree",
       "0x6760cDeC573cf38568C59872ee48B6fED41F8A4c": "agree",
-      "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "idle",
-      "0xA793D9dc0ED9edC1f9F732bB68b5D3AFA934F52D": "agree",
-      "0xcF5Fd792Df0Dc9d297af75c82B4A0011e8FA1A4A": "idle"
+      "0x8142E5D1b04f84c3cD995C25AAe31B31F8e0379E": "idle",
+      "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "idle"
     }
   },
   "deployer": "0x42E1B020B9904c545893280529f1F6e9496c4a70",
-  "deployedAt": "2026-09-18T16:15:25.067Z",
+  "deployedAt": "2026-09-19T20:25:52.835Z",
   "runner": "{ \"Depends\": \"py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng\" }\r",
   "fixtureBaseUrl": "https://redemption-guard.vercel.app",
   "assets": [
@@ -32,18 +32,18 @@
         "redemption-guard.vercel.app"
       ],
       "tx": {
-        "hash": "0xdc39bb51dce2dd222079fed0a70439810ab2153886f8731909d3b47f101ab05b",
+        "hash": "0xb97c4be3df16b757120e705cca79b6276a039ae4cb4156a20b564cbdd80f3129",
         "statusName": "ACCEPTED",
         "executionResultName": "FINISHED_WITH_RETURN",
         "successful": true,
-        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xdc39bb51dce2dd222079fed0a70439810ab2153886f8731909d3b47f101ab05b",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xb97c4be3df16b757120e705cca79b6276a039ae4cb4156a20b564cbdd80f3129",
         "validators": 5,
         "votes": {
-          "0x5cDf4BdDeEDa0e32ED596b94f69AcC0FbB57f264": "idle",
-          "0x6760cDeC573cf38568C59872ee48B6fED41F8A4c": "agree",
-          "0xE4E106086F167D75E2270fa5f3680f6ac598d179": "agree",
-          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "idle",
-          "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "agree"
+          "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "idle",
+          "0x5A4230B920b18c4AFD3A28F99Eae669B7F2cdC1e": "agree",
+          "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "idle",
+          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
+          "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "agree"
         }
       }
     },
@@ -55,17 +55,17 @@
         "redemption-guard.vercel.app"
       ],
       "tx": {
-        "hash": "0x4224b17855559dfa178d782fbc17b303da464b1083e708830092555bad7818f1",
+        "hash": "0xa316b4f8f6b5e48d528d9a57a60daec288179d3cccf20dd2b1ae082064d6b196",
         "statusName": "ACCEPTED",
         "executionResultName": "FINISHED_WITH_RETURN",
         "successful": true,
-        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x4224b17855559dfa178d782fbc17b303da464b1083e708830092555bad7818f1",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xa316b4f8f6b5e48d528d9a57a60daec288179d3cccf20dd2b1ae082064d6b196",
         "validators": 5,
         "votes": {
-          "0x5cDf4BdDeEDa0e32ED596b94f69AcC0FbB57f264": "agree",
-          "0xE4E106086F167D75E2270fa5f3680f6ac598d179": "idle",
-          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
-          "0xa0435f618c1F27B254998018AEa8Da5C77187852": "agree",
+          "0x1dA3a7de8EA65A318bf88Eb63d3dC55295Dd257E": "agree",
+          "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "agree",
+          "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "idle",
+          "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "agree",
           "0xcF5Fd792Df0Dc9d297af75c82B4A0011e8FA1A4A": "idle"
         }
       }

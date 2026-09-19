@@ -1,8 +1,8 @@
 {
-  "contractAddress": "0xf0c2BeA9ccb6ff576a775baED471B02Cbf513862",
+  "contractAddress": "0x7D77A1742Ba479c1EEBE867CB1EAbCc1acF44231",
   "network": "studio-next",
   "chainId": 61997,
-  "generatedAt": "2026-09-18T16:19:10.754Z",
+  "generatedAt": "2026-09-19T20:29:01.098Z",
   "flows": [
     {
       "name": "RESTRICTED then blocked exposure",
@@ -11,39 +11,39 @@
       "expectedStatus": "RESTRICTED",
       "amountUnits": 100000,
       "assessTx": {
-        "hash": "0xb14651ccf41027d050b338779492b4ec9490272915996810808d3117fceeeda6",
+        "hash": "0x3721189d542d0e518f8d010c0b9564439d97493bec0febd700dbdc027b04933f",
         "statusName": "FINALIZED",
         "executionResultName": "FINISHED_WITH_RETURN",
         "successful": true,
-        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xb14651ccf41027d050b338779492b4ec9490272915996810808d3117fceeeda6",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x3721189d542d0e518f8d010c0b9564439d97493bec0febd700dbdc027b04933f",
         "validators": 5,
         "votes": {
-          "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "idle",
-          "0x5A4230B920b18c4AFD3A28F99Eae669B7F2cdC1e": "agree",
-          "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "agree",
-          "0xE4E106086F167D75E2270fa5f3680f6ac598d179": "idle",
-          "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "agree"
+          "0x1dA3a7de8EA65A318bf88Eb63d3dC55295Dd257E": "agree",
+          "0x5A4230B920b18c4AFD3A28F99Eae669B7F2cdC1e": "idle",
+          "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "idle",
+          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
+          "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "agree"
         }
       },
       "onChainStatus": "RESTRICTED",
       "assessmentId": 1,
-      "reasoning": "Authoritative notice from redemption-guard.vercel.app states that redemptions of HLUSD are suspended effective 17 September 2026.",
+      "reasoning": "The authoritative issuer-domain notice dated 18 September 2026 explicitly states that all HLUSD redemptions are suspended and no redemptions are being processed.",
       "reasonCodes": [
         "REDEMPTIONS_SUSPENDED"
       ],
       "exposureTx": {
-        "hash": "0xbd69447f39d443694cbe38cc5ebd1ce5ef9b167aa94e06c79250e23e7a008beb",
+        "hash": "0xd4c00b658764014df3cc0f81992d6e2ac6e8289ef21c4035e6e49678df4503d2",
         "statusName": "FINALIZED",
         "executionResultName": "FINISHED_WITH_ERROR",
         "successful": false,
-        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xbd69447f39d443694cbe38cc5ebd1ce5ef9b167aa94e06c79250e23e7a008beb",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xd4c00b658764014df3cc0f81992d6e2ac6e8289ef21c4035e6e49678df4503d2",
         "validators": 5,
         "votes": {
-          "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "agree",
           "0x5cDf4BdDeEDa0e32ED596b94f69AcC0FbB57f264": "idle",
-          "0x8142E5D1b04f84c3cD995C25AAe31B31F8e0379E": "agree",
-          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
-          "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "idle"
+          "0xA793D9dc0ED9edC1f9F732bB68b5D3AFA934F52D": "agree",
+          "0xa0435f618c1F27B254998018AEa8Da5C77187852": "agree",
+          "0xcF5Fd792Df0Dc9d297af75c82B4A0011e8FA1A4A": "idle",
+          "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "agree"
         },
         "errorText": "[EXPECTED] EXPOSURE_BLOCKED: HLUSD latest assessment #1 is RESTRICTED"
       },
@@ -58,39 +58,39 @@
       "expectedStatus": "INSUFFICIENT_EVIDENCE",
       "amountUnits": 100000,
       "assessTx": {
-        "hash": "0x21eca7d420ed24e8c82dcbc2514f578ed489fe19388ed948a250ec82af63b80f",
+        "hash": "0xe9f707ee943c63470d22a802d0259110ee7bcfa9a7e5a04efb675a0a57584be1",
         "statusName": "FINALIZED",
         "executionResultName": "FINISHED_WITH_RETURN",
         "successful": true,
-        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x21eca7d420ed24e8c82dcbc2514f578ed489fe19388ed948a250ec82af63b80f",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xe9f707ee943c63470d22a802d0259110ee7bcfa9a7e5a04efb675a0a57584be1",
         "validators": 5,
         "votes": {
-          "0x5cDf4BdDeEDa0e32ED596b94f69AcC0FbB57f264": "agree",
-          "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "idle",
-          "0xa0435f618c1F27B254998018AEa8Da5C77187852": "agree",
-          "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "idle",
-          "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "agree"
+          "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "agree",
+          "0x6760cDeC573cf38568C59872ee48B6fED41F8A4c": "agree",
+          "0x8142E5D1b04f84c3cD995C25AAe31B31F8e0379E": "idle",
+          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
+          "0xa0435f618c1F27B254998018AEa8Da5C77187852": "idle"
         }
       },
       "onChainStatus": "INSUFFICIENT_EVIDENCE",
       "assessmentId": 2,
-      "reasoning": "The sole authoritative source explicitly states it does not confirm whether HLUSD redemptions are operational, delayed, or suspended, leaving redemption status unresolved. The source is current and correctly identifies the asset, but its content is ambiguous regarding redemption operations.",
+      "reasoning": "The sole authoritative source explicitly states it does not confirm whether HLUSD redemptions are operating, delayed, or suspended, leaving redemption status unresolved. This ambiguity means there is no clear evidence that ordinary redemptions remain operational.",
       "reasonCodes": [
         "SOURCE_AMBIGUOUS",
         "NO_REDEMPTION_INFORMATION"
       ],
       "exposureTx": {
-        "hash": "0xc9bf0f15a697da3ee9211ac3797f65e03386e54f8562dd0be1e3df8e86d004b9",
+        "hash": "0xd9292430bb74717867e1e7df5ca3c5358273f37882bd0cf139d697b75fd4512e",
         "statusName": "FINALIZED",
         "executionResultName": "FINISHED_WITH_ERROR",
         "successful": false,
-        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xc9bf0f15a697da3ee9211ac3797f65e03386e54f8562dd0be1e3df8e86d004b9",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xd9292430bb74717867e1e7df5ca3c5358273f37882bd0cf139d697b75fd4512e",
         "validators": 5,
         "votes": {
-          "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "idle",
+          "0x6760cDeC573cf38568C59872ee48B6fED41F8A4c": "agree",
+          "0xE4E106086F167D75E2270fa5f3680f6ac598d179": "agree",
           "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
-          "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "agree",
-          "0xa0435f618c1F27B254998018AEa8Da5C77187852": "agree",
+          "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "idle",
           "0xcF5Fd792Df0Dc9d297af75c82B4A0011e8FA1A4A": "idle"
         },
         "errorText": "[EXPECTED] EXPOSURE_BLOCKED: HLUSD latest assessment #2 is INSUFFICIENT_EVIDENCE"
@@ -106,39 +106,39 @@
       "expectedStatus": "ELIGIBLE",
       "amountUnits": 250000,
       "assessTx": {
-        "hash": "0x39764b1b659ff611c1941b7a61048cf0530943d726dbc96e17d76083fa441c3d",
+        "hash": "0x712c3cfeba7ec3a81a0cc70d0f5db168cbb90464272d929479fc5b9de53f2aa9",
         "statusName": "FINALIZED",
         "executionResultName": "FINISHED_WITH_RETURN",
         "successful": true,
-        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x39764b1b659ff611c1941b7a61048cf0530943d726dbc96e17d76083fa441c3d",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x712c3cfeba7ec3a81a0cc70d0f5db168cbb90464272d929479fc5b9de53f2aa9",
         "validators": 5,
         "votes": {
-          "0x1dA3a7de8EA65A318bf88Eb63d3dC55295Dd257E": "agree",
-          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "idle",
+          "0xE4E106086F167D75E2270fa5f3680f6ac598d179": "agree",
+          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
           "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "agree",
-          "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "idle",
-          "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "agree"
+          "0xa0435f618c1F27B254998018AEa8Da5C77187852": "idle",
+          "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "idle"
         }
       },
       "onChainStatus": "ELIGIBLE",
       "assessmentId": 3,
-      "reasoning": "The authoritative source from the registered issuer domain confirms that redemptions for NWUSD are fully operational and processing on a normal schedule as of September 18, 2026. The evidence is current and explicitly names the asset under review.",
+      "reasoning": "Authoritative evidence from the registered issuer domain confirms that redemptions for NWUSD are fully operational and processing on a normal schedule. The evidence is dated 2026-09-18, which is within the 90-day validity window.",
       "reasonCodes": [
         "REDEMPTIONS_OPERATIONAL"
       ],
       "exposureTx": {
-        "hash": "0x3c9938eb8a39a81d7cb0acca2d962eac2c30171b572d0bbefa9430e7bee0eb65",
+        "hash": "0xa18a7ebf173be29cd2a8fd88899ee78cf0d2eed7beb5b636a434c8ad856191e5",
         "statusName": "FINALIZED",
         "executionResultName": "FINISHED_WITH_RETURN",
         "successful": true,
-        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x3c9938eb8a39a81d7cb0acca2d962eac2c30171b572d0bbefa9430e7bee0eb65",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xa18a7ebf173be29cd2a8fd88899ee78cf0d2eed7beb5b636a434c8ad856191e5",
         "validators": 5,
         "votes": {
-          "0x6760cDeC573cf38568C59872ee48B6fED41F8A4c": "idle",
+          "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "idle",
+          "0x5A4230B920b18c4AFD3A28F99Eae669B7F2cdC1e": "idle",
           "0xE4E106086F167D75E2270fa5f3680f6ac598d179": "agree",
-          "0xa0435f618c1F27B254998018AEa8Da5C77187852": "idle",
-          "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "agree",
-          "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "agree"
+          "0xa0435f618c1F27B254998018AEa8Da5C77187852": "agree",
+          "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "agree"
         }
       },
       "exposureAllowed": true,

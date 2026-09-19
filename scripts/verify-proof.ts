@@ -3,7 +3,7 @@ import { PROOF_FILE, readConsensusDetails, readJson, writeFrontendProof, writeJs
 
 type Proof = Parameters<typeof writeFrontendProof>[0] & { flows: { name: string; assessTx: TxOutcome; exposureTx: TxOutcome }[] };
 const proof = readJson<Proof>(PROOF_FILE);
-if (!proof) throw new Error("demo-proof.json missing; run npm run seed");
+if (!proof) throw new Error("demo-proof.json missing; run npm run deploy:demo");
 for (const flow of proof.flows) {
   for (const tx of [flow.assessTx, flow.exposureTx]) {
     const d = await readConsensusDetails(tx.hash);

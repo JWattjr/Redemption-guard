@@ -27,6 +27,7 @@ import {
   StatusBadge,
   groupUnits,
   short,
+  utcTime,
   when,
 } from "./parts";
 
@@ -305,7 +306,12 @@ export default function Dashboard() {
             <section className="panel" aria-labelledby="assess-title">
               <div className="panel__head">
                 <h2 id="assess-title">1 · Submit evidence</h2>
-                <AssetPicker value={selected} onChange={setSelected} ids={data?.assets.map((a) => a.asset_id)} />
+                <AssetPicker
+                  value={selected}
+                  onChange={setSelected}
+                  ids={data?.assets.map((a) => a.asset_id)}
+                  label="Assessment asset"
+                />
               </div>
               <p className="panel__lede">
                 Validators fetch these URLs themselves, judge them against the frozen policy, and must agree on the
@@ -383,7 +389,12 @@ export default function Dashboard() {
             <section className="panel" aria-labelledby="exposure-title">
               <div className="panel__head">
                 <h2 id="exposure-title">2 · Request exposure</h2>
-                <AssetPicker value={selected} onChange={setSelected} ids={data?.assets.map((a) => a.asset_id)} />
+                <AssetPicker
+                  value={selected}
+                  onChange={setSelected}
+                  ids={data?.assets.map((a) => a.asset_id)}
+                  label="Exposure asset"
+                />
               </div>
               <p className="panel__lede">
                 Deterministic contract code checks the latest agreed status. Only <strong>ELIGIBLE</strong> records the
@@ -393,7 +404,9 @@ export default function Dashboard() {
                 <span className="small muted">Current gate for {selected}</span>
                 <StatusBadge status={asset?.latest_status ?? ""} />
                 <span className="small">
-                  {asset?.latest_status === "ELIGIBLE"
+                  {asset?.latest_status === "ELIGIBLE" && asset.gate_open === false && asset.gate_open_at
+                    ? "This ELIGIBLE assessment is cooling down. Gate re-opens at " + utcTime(asset.gate_open_at) + "."
+                    : asset?.latest_status === "ELIGIBLE"
                     ? `Contract should record this request (assessment #${latest?.id}).`
                     : "Contract should reject this request. Send it anyway to see the on-chain rejection."}
                 </span>
@@ -462,16 +475,56 @@ export default function Dashboard() {
   );
 }
 
-function AssetPicker({ value, onChange, ids }: { value: string; onChange: (v: string) => void; ids?: string[] }) {
+function AssetPicker({
+  value,
+  onChange,
+  ids,
+  label,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  ids?: string[];
+  label: string;
+}) {
   const options = ids?.length ? ids : ["NWUSD", "HLUSD"];
+  const buttons = useRef<Record<string, HTMLButtonElement | null>>({});
+  const move = (index: number) => {
+    const next = options[(index + options.length) % options.length];
+    onChange(next);
+    requestAnimationFrame(() => buttons.current[next]?.focus());
+  };
   return (
-    <div className="segmented" role="radiogroup" aria-label="Asset">
+    <div
+      className="segmented"
+      role="radiogroup"
+      aria-label={label}
+      onKeyDown={(event) => {
+        const index = options.indexOf(value);
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+          event.preventDefault();
+          move(index + 1);
+        } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+          event.preventDefault();
+          move(index - 1);
+        } else if (event.key === "Home") {
+          event.preventDefault();
+          move(0);
+        } else if (event.key === "End") {
+          event.preventDefault();
+          move(options.length - 1);
+        }
+      }}
+    >
       {options.map((id) => (
         <button
           key={id}
           type="button"
           role="radio"
           aria-checked={value === id}
+          tabIndex={value === id ? 0 : -1}
+          ref={(element) => {
+            buttons.current[id] = element;
+          }}
           className={`segmented__item ${value === id ? "is-active" : ""}`}
           onClick={() => onChange(id)}
         >
@@ -498,6 +551,9 @@ function OutcomeCard({ outcome }: { outcome: Outcome }) {
     if (outcome.confirmation === "assessment-recorded" && outcome.assessment) {
       headline = `Validators agreed: ${STATUS_META[outcome.assessment.status].label}`;
       tone = STATUS_META[outcome.assessment.status].tone;
+    } else if (outcome.confirmation === "unconfirmed") {
+      headline = "Could not confirm assessment outcome";
+      tone = "none";
     } else {
       headline = "No assessment was recorded";
       tone = "restricted";
@@ -505,9 +561,12 @@ function OutcomeCard({ outcome }: { outcome: Outcome }) {
   } else if (outcome.confirmation === "exposure-recorded") {
     headline = `Exposure recorded for ${outcome.assetId}`;
     tone = "eligible";
-  } else {
+  } else if (outcome.confirmation === "no-state-change" && details?.errorText) {
     headline = `Exposure blocked for ${outcome.assetId}`;
     tone = "restricted";
+  } else {
+    headline = "Could not confirm exposure outcome";
+    tone = "none";
   }
 
   return (
@@ -520,6 +579,13 @@ function OutcomeCard({ outcome }: { outcome: Outcome }) {
       {outcome.assessment && (
         <>
           <p className="outcome__reasoning">{outcome.assessment.reasoning}</p>
+          {outcome.assessment.status === "ELIGIBLE" && outcome.assessment.gate_open_at && (
+            <p className="outcome__cooldown">
+              {new Date(outcome.assessment.gate_open_at).getTime() > new Date(outcome.assessment.assessed_at).getTime()
+                ? "Gate re-opens at " + utcTime(outcome.assessment.gate_open_at) + "."
+                : "Exposure gate is open."}
+            </p>
+          )}
           <ReasonCodes codes={outcome.assessment.reason_codes} />
           <EvidenceList assessment={outcome.assessment} />
         </>

@@ -16,6 +16,13 @@ export function when(iso?: string) {
   return `${d.toLocaleString("en-GB", { timeZone: "UTC", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false })} UTC`;
 }
 
+export function utcTime(iso?: string | null) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return `${d.toLocaleTimeString("en-GB", { timeZone: "UTC", hour: "2-digit", minute: "2-digit", hour12: false })} UTC`;
+}
+
 export function groupUnits(units: string) {
   return units.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
@@ -80,7 +87,8 @@ export function AssetCard({
   onSelect: () => void;
 }) {
   const meta = STATUS_META[asset.latest_status];
-  const open = asset.latest_status === "ELIGIBLE";
+  const open = asset.gate_open ?? asset.latest_status === "ELIGIBLE";
+  const cooling = asset.latest_status === "ELIGIBLE" && !open && asset.gate_open_at;
   return (
     <article className={`asset asset--${meta.tone} ${selected ? "asset--selected" : ""}`}>
       <header className="asset__head">
@@ -95,7 +103,9 @@ export function AssetCard({
       <div className={`gate ${open ? "gate--open" : "gate--closed"}`}>
         <span className="gate__label">Exposure gate</span>
         <span className="gate__value">{open ? "Open" : "Closed"}</span>
-        <span className="gate__note">{meta.gate}</span>
+        <span className="gate__note">
+          {cooling ? `Gate re-opens at ${utcTime(asset.gate_open_at)}` : meta.gate}
+        </span>
       </div>
 
       {latest ? (
@@ -152,6 +162,12 @@ export function PolicyPanel({ policy }: { policy?: Policy }) {
           deterministic code.
         </li>
         {policy && <li>Evidence older than {policy.stale_after_days} days is stale.</li>}
+        {policy && (
+          <li>
+            A recovery from RESTRICTED to ELIGIBLE is recorded immediately but the gate re-opens after{" "}
+            {Math.round((policy.restricted_to_eligible_cooldown_seconds ?? 3600) / 60)} minutes.
+          </li>
+        )}
       </ul>
     </section>
   );
@@ -261,7 +277,7 @@ export function ProofPanel({ proof, contractAddress }: { proof: { contractAddres
         <span className="muted small">Seeded {when(proof.generatedAt)} · re-read from chain</span>
       </div>
       <p className="panel__lede">
-        The three reference flows, recorded by <code>npm run seed</code> against this contract. Blocked requests appear
+        The three reference flows, recorded by <code>npm run deploy:demo</code> against this contract. Blocked requests appear
         here because a reverted transaction leaves no contract state.
       </p>
       <ol className="proofs">

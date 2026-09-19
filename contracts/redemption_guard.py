@@ -10,7 +10,7 @@ Authorization prototype only: no custody, no tokens, no price feeds.
 
 import json
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from html import unescape
 
 import genlayer as gl
@@ -70,6 +70,7 @@ MAX_REASONING_CHARS = 480
 MAX_AMOUNT_UNITS = 10**30
 STALE_AFTER_DAYS = 90
 LLM_ATTEMPTS = 2
+RESTRICTED_TO_ELIGIBLE_COOLDOWN_SECONDS = 60 * 60
 
 ASSET_ID_RE = re.compile(r"^[A-Z0-9]{2,12}$")
 HOST_RE = re.compile(r"^(?=.{4,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$")
@@ -82,6 +83,23 @@ def _tx_time() -> datetime:
     raw = str(gl.message.raw["datetime"])
     moment = datetime.fromisoformat(raw.replace("Z", "+00:00"))
     return moment if moment.tzinfo else moment.replace(tzinfo=timezone.utc)
+
+
+def _gate_open_at(record: dict):
+    raw = record.get("gate_open_at")
+    if not raw:
+        return None
+    return datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+
+
+def _gate_is_open(record: dict, now: datetime) -> bool:
+    if record.get("status") != ELIGIBLE:
+        return False
+    try:
+        opens_at = _gate_open_at(record)
+    except Exception:
+        return False
+    return opens_at is None or now >= opens_at
 
 
 def _fail(prefix: str, message: str):
@@ -400,6 +418,7 @@ class RedemptionGuard(gl.contract.Contract):
         urls = _validate_urls(evidence_urls_json)
         now = _tx_time()
         assessed_on = now.date().isoformat()
+        previous_status = self._latest_status(asset_id)
 
         def leader_fn():
             return _evaluate(asset, urls, assessed_on)
@@ -430,6 +449,13 @@ class RedemptionGuard(gl.contract.Contract):
         if not _leader_result_well_formed(result, urls):
             _fail(ERROR_LLM, "MALFORMED_CONSENSUS_RESULT")
         assessment_id = len(self.assessments) + 1
+        gate_open_at = None
+        if result["status"] == ELIGIBLE:
+            gate_open_at = (
+                now + timedelta(seconds=RESTRICTED_TO_ELIGIBLE_COOLDOWN_SECONDS)
+                if previous_status == RESTRICTED
+                else now
+            ).isoformat()
         record = {
             "id": assessment_id,
             "asset_id": asset_id,
@@ -442,6 +468,7 @@ class RedemptionGuard(gl.contract.Contract):
             "policy_id": POLICY_ID,
             "requested_by": gl.message.sender_address.as_hex,
             "assessed_at": now.isoformat(),
+            "gate_open_at": gate_open_at,
         }
         self.assessments.append(json.dumps(record, sort_keys=True))
         self.latest_assessment[asset_id] = assessment_id
@@ -466,6 +493,17 @@ class RedemptionGuard(gl.contract.Contract):
                 ERROR_EXPECTED,
                 f"EXPOSURE_BLOCKED: {asset_id} latest assessment #{latest_id} is {latest['status']}",
             )
+        gate_open_at = latest.get("gate_open_at")
+        if gate_open_at:
+            try:
+                opens_at = _gate_open_at(latest)
+            except Exception:
+                _fail(ERROR_EXPECTED, f"EXPOSURE_BLOCKED: {asset_id} latest assessment #{latest_id} has invalid gate timing")
+            if opens_at is not None and _tx_time() < opens_at:
+                _fail(
+                    ERROR_EXPECTED,
+                    f"EXPOSURE_BLOCKED: {asset_id} latest assessment #{latest_id} is ELIGIBLE; cooldown until {gate_open_at}",
+                )
         exposure_id = len(self.exposures) + 1
         record = {
             "id": exposure_id,
@@ -491,6 +529,7 @@ class RedemptionGuard(gl.contract.Contract):
             "max_assets": MAX_ASSETS,
             "max_urls": MAX_URLS,
             "stale_after_days": STALE_AFTER_DAYS,
+            "restricted_to_eligible_cooldown_seconds": RESTRICTED_TO_ELIGIBLE_COOLDOWN_SECONDS,
         }
 
     @gl.public.view
@@ -536,7 +575,7 @@ class RedemptionGuard(gl.contract.Contract):
             "exposure_request_count": len(self.exposures),
             "status_counts": {s: int(self.status_counts.get(s, 0)) for s in STATUSES},
             "eligible_assets": [
-                a for a in self.asset_ids if self._latest_status(a) == ELIGIBLE
+                a for a in self.asset_ids if self._gate_is_open_for_asset(a)
             ],
         }
 
@@ -571,10 +610,22 @@ class RedemptionGuard(gl.contract.Contract):
             return ""
         return json.loads(self.assessments[latest_id - 1])["status"]
 
+    def _latest_record(self, asset_id: str) -> dict:
+        latest_id = self.latest_assessment.get(asset_id, 0)
+        if latest_id == 0:
+            return {}
+        return json.loads(self.assessments[latest_id - 1])
+
+    def _gate_is_open_for_asset(self, asset_id: str) -> bool:
+        return _gate_is_open(self._latest_record(asset_id), _tx_time())
+
     def _asset_view(self, asset_id: str) -> dict:
         profile = json.loads(self.assets[asset_id])
         profile["latest_assessment_id"] = int(self.latest_assessment.get(asset_id, 0))
         profile["latest_status"] = self._latest_status(asset_id)
+        latest = self._latest_record(asset_id)
+        profile["gate_open_at"] = latest.get("gate_open_at") or None
+        profile["gate_open"] = self._gate_is_open_for_asset(asset_id)
         profile["approved_exposure_units"] = str(self.exposure_units.get(asset_id, 0))
         return profile
 

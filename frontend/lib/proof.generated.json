@@ -1,6 +1,6 @@
 {
-  "contractAddress": "0xf0c2BeA9ccb6ff576a775baED471B02Cbf513862",
-  "generatedAt": "2026-09-18T16:19:10.754Z",
+  "contractAddress": "0x7D77A1742Ba479c1EEBE867CB1EAbCc1acF44231",
+  "generatedAt": "2026-09-19T20:29:01.098Z",
   "flows": [
     {
       "name": "RESTRICTED then blocked exposure",
@@ -9,20 +9,20 @@
       "assessmentId": 1,
       "exposureAllowed": false,
       "assess": {
-        "hash": "0xb14651ccf41027d050b338779492b4ec9490272915996810808d3117fceeeda6",
+        "hash": "0x3721189d542d0e518f8d010c0b9564439d97493bec0febd700dbdc027b04933f",
         "statusName": "FINALIZED",
         "executionResultName": "FINISHED_WITH_RETURN",
         "validators": 5,
         "votes": {
-          "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "idle",
-          "0x5A4230B920b18c4AFD3A28F99Eae669B7F2cdC1e": "agree",
-          "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "agree",
-          "0xE4E106086F167D75E2270fa5f3680f6ac598d179": "idle",
-          "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "agree"
+          "0x1dA3a7de8EA65A318bf88Eb63d3dC55295Dd257E": "agree",
+          "0x5A4230B920b18c4AFD3A28F99Eae669B7F2cdC1e": "idle",
+          "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "idle",
+          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
+          "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "agree"
         }
       },
       "exposure": {
-        "hash": "0xbd69447f39d443694cbe38cc5ebd1ce5ef9b167aa94e06c79250e23e7a008beb",
+        "hash": "0xd4c00b658764014df3cc0f81992d6e2ac6e8289ef21c4035e6e49678df4503d2",
         "statusName": "FINALIZED",
         "executionResultName": "FINISHED_WITH_ERROR",
         "errorText": "[EXPECTED] EXPOSURE_BLOCKED: HLUSD latest assessment #1 is RESTRICTED"
@@ -35,20 +35,20 @@
       "assessmentId": 2,
       "exposureAllowed": false,
       "assess": {
-        "hash": "0x21eca7d420ed24e8c82dcbc2514f578ed489fe19388ed948a250ec82af63b80f",
+        "hash": "0xe9f707ee943c63470d22a802d0259110ee7bcfa9a7e5a04efb675a0a57584be1",
         "statusName": "FINALIZED",
         "executionResultName": "FINISHED_WITH_RETURN",
         "validators": 5,
         "votes": {
-          "0x5cDf4BdDeEDa0e32ED596b94f69AcC0FbB57f264": "agree",
-          "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "idle",
-          "0xa0435f618c1F27B254998018AEa8Da5C77187852": "agree",
-          "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "idle",
-          "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "agree"
+          "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "agree",
+          "0x6760cDeC573cf38568C59872ee48B6fED41F8A4c": "agree",
+          "0x8142E5D1b04f84c3cD995C25AAe31B31F8e0379E": "idle",
+          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
+          "0xa0435f618c1F27B254998018AEa8Da5C77187852": "idle"
         }
       },
       "exposure": {
-        "hash": "0xc9bf0f15a697da3ee9211ac3797f65e03386e54f8562dd0be1e3df8e86d004b9",
+        "hash": "0xd9292430bb74717867e1e7df5ca3c5358273f37882bd0cf139d697b75fd4512e",
         "statusName": "FINALIZED",
         "executionResultName": "FINISHED_WITH_ERROR",
         "errorText": "[EXPECTED] EXPOSURE_BLOCKED: HLUSD latest assessment #2 is INSUFFICIENT_EVIDENCE"
@@ -61,20 +61,20 @@
       "assessmentId": 3,
       "exposureAllowed": true,
       "assess": {
-        "hash": "0x39764b1b659ff611c1941b7a61048cf0530943d726dbc96e17d76083fa441c3d",
+        "hash": "0x712c3cfeba7ec3a81a0cc70d0f5db168cbb90464272d929479fc5b9de53f2aa9",
         "statusName": "FINALIZED",
         "executionResultName": "FINISHED_WITH_RETURN",
         "validators": 5,
         "votes": {
-          "0x1dA3a7de8EA65A318bf88Eb63d3dC55295Dd257E": "agree",
-          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "idle",
+          "0xE4E106086F167D75E2270fa5f3680f6ac598d179": "agree",
+          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
           "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "agree",
-          "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "idle",
-          "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "agree"
+          "0xa0435f618c1F27B254998018AEa8Da5C77187852": "idle",
+          "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "idle"
         }
       },
       "exposure": {
-        "hash": "0x3c9938eb8a39a81d7cb0acca2d962eac2c30171b572d0bbefa9430e7bee0eb65",
+        "hash": "0xa18a7ebf173be29cd2a8fd88899ee78cf0d2eed7beb5b636a434c8ad856191e5",
         "statusName": "FINALIZED",
         "executionResultName": "FINISHED_WITH_RETURN"
       }
