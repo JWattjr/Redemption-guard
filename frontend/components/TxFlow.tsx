@@ -9,7 +9,7 @@ export type TxRequest = {
   kind: "assess" | "exposure";
   title: string;
   method: "assess_asset" | "request_exposure";
-  args: (string | bigint)[];
+  args: (string | number | bigint)[];
 };
 
 /**

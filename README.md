@@ -130,6 +130,41 @@ cd frontend && vercel deploy --prod
 
 The evidence fixtures must be reachable over public HTTPS before deploying. The scripts check this and stop if they are not. Their host (`FIXTURE_BASE_URL`, default `https://redemption-guard.vercel.app`) is registered on-chain as the demo assets' issuer domain.
 
+## Redemption Guard v2 (additive, opt-in)
+
+v2 is a separate contract and artifact set. It does not replace the deployed v1
+address, rewrite `deployments/studio-next.json`, or modify `demo-proof.json`.
+Deploy and seed it only when a fresh v2 address is acceptable:
+
+```bash
+npm run contract:lint:v2
+npm run deploy:v2
+npm run seed:v2
+```
+
+The v2 helpers write `deployments/studio-next-v2.json`,
+`deployments/demo-proof-v2.json`, `frontend/lib/deployment.v2.generated.json`,
+and `frontend/lib/proof.v2.generated.json`. No v2 deployment is committed by
+default; hashes are reported only from finalized transaction receipts.
+
+After a v2 deployment has been independently verified, an opt-in frontend build
+can use `NEXT_PUBLIC_V2_CONTRACT_ADDRESS=<address>` and
+`NEXT_PUBLIC_DEPLOYMENT_VERSION=v2`. The default build remains v1 so the
+published proof board cannot silently switch contracts. In v2 mode, exposure
+requests bind the beneficiary to the connected wallet and include a fresh
+nonce and one-hour authorization expiry.
+
+v2 adds explicit `ADMIN`, `ASSESSOR`, and `PAUSER` roles; two-step ownership
+transfer; canonical per-asset source policies with required sources, minimum
+usable-source counts, and monotonic policy versions; assessment validity/expiry; emergency pause;
+per-asset and per-beneficiary exposure caps; caller-bound beneficiary,
+nonce/expiry replay guards; and policy-version invalidation. Recovery from
+`RESTRICTED` retains the one-hour cooldown. These are authorization and
+idempotency controls, not token settlement: the installed SDK has no verified
+token adapter, signature authorization, atomic transfer, or multisig primitive
+used here. A real asset adapter must re-check beneficiary authorization and
+perform the token movement atomically outside this prototype.
+
 ## Studio Next notes
 
 - RPC `https://studio-dev.genlayer.com/api`, chain 61997, explorer `https://explorer-studio-dev.genlayer.com`.

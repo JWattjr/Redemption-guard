@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TrackedStatus } from "@genlayer/transaction-kit-react";
-import { CONTRACT_ADDRESS, FIXTURES, STUDIO_NEXT, explorerAddress, explorerTx } from "@/lib/config";
+import { CONTRACT_ADDRESS, DEPLOYMENT_VERSION, FIXTURES, STUDIO_NEXT, V2_CONTRACT_ADDRESS, explorerAddress, explorerTx } from "@/lib/config";
 import {
   fetchDashboard,
   fetchTxDetails,
@@ -145,14 +145,21 @@ export default function Dashboard() {
     });
 
   const submitExposure = () =>
-    begin({
-      kind: "exposure",
-      title: `Request ${groupUnits(amount.trim())} units of ${selected} exposure`,
-      method: "request_exposure",
-      args: [selected, BigInt(amount.trim())],
-      assetId: selected,
-      amountUnits: amount.trim(),
-    });
+    (() => {
+      if (DEPLOYMENT_VERSION === "v2" && !wallet.address) return;
+      const args =
+        DEPLOYMENT_VERSION === "v2"
+          ? [selected, BigInt(amount.trim()), wallet.address as string, `ui-${Date.now().toString(36)}`, Math.floor(Date.now() / 1000) + 3600]
+          : [selected, BigInt(amount.trim())];
+      begin({
+        kind: "exposure",
+        title: `Request ${groupUnits(amount.trim())} units of ${selected} exposure`,
+        method: "request_exposure",
+        args,
+        assetId: selected,
+        amountUnits: amount.trim(),
+      });
+    })();
 
   const onDone = useCallback(
     async (tracked: TrackedStatus) => {
@@ -264,6 +271,11 @@ export default function Dashboard() {
         <div className="alert alert--warn" role="alert">
           Your wallet is on chain {wallet.chainId}. Writes are disabled until you switch to GenLayer Studio Next (chain{" "}
           {STUDIO_NEXT.chainId}). Reads below still come straight from Studio Next.
+        </div>
+      )}
+      {data?.summary.paused && (
+        <div className="alert alert--warn" role="alert">
+          Emergency pause active{data.summary.pause_reason ? `: ${data.summary.pause_reason}` : "."} New exposure is blocked.
         </div>
       )}
 
@@ -505,7 +517,7 @@ export default function Dashboard() {
         <aside className="col col--side">
           <PolicyPanel policy={data?.policy} />
           <Activity assessments={data?.assessments ?? []} exposures={data?.exposures ?? []} />
-          <ContractPanel address={CONTRACT_ADDRESS} owner={data?.owner} />
+          <ContractPanel address={CONTRACT_ADDRESS} owner={data?.owner} v2Address={V2_CONTRACT_ADDRESS} deploymentVersion={DEPLOYMENT_VERSION} />
         </aside>
       </main>
 

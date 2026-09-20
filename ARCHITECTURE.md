@@ -90,12 +90,44 @@ All persistent fields use GenVM storage types (`DynArray`, `TreeMap`, `u256`, `A
 - **Success is never inferred from lifecycle alone.** After the panel finishes, the app (1) reads the raw transaction for `txExecutionResultName`, validator votes, and the decoded revert reason, then (2) re-reads contract state to confirm that the assessment id advanced or the exposure count grew. Non-final lifecycles (`ACCEPTED`) are labeled "not final". A restricted-to-eligible recovery displays the on-chain `gate_open_at` time.
 - The wallet is switched to or added as chain 61997 on connect. A wrong network disables writes and shows a banner. A Studio Next test-GEN faucet button covers fees.
 
+## v2 hardening boundary
+
+`contracts/redemption_guard_v2.py` is a new deployment, not an upgrade of the
+v1 contract. Its source policy is stored per asset as a canonical, sorted list
+of required HTTPS URLs, a minimum usable-source count, the registered issuer
+domains, and an increasing policy version. If any required source is omitted or
+the minimum source count is not met, the consensus path records
+`INSUFFICIENT_EVIDENCE`; it never silently treats an incomplete submission as
+eligible.
+
+Assessment records carry the policy version and an expiry timestamp. Exposure
+requests additionally carry an explicit beneficiary, caller-supplied nonce and
+future expiry. The beneficiary must be the caller in this scaffold; delegated
+beneficiaries require a signed permit/adapter that is not supplied by the
+pinned SDK. The `(asset, beneficiary, nonce)` key is consumed before an
+exposure record is appended, so a repeated request is rejected. Per-asset and
+per-beneficiary caps, pause state, role checks, source-policy version matching,
+and the existing restricted-to-eligible cooldown are deterministic checks
+around the consensus result. Ownership transfer is two-step
+(`transfer_ownership` then `accept_ownership`), and role membership is explicit
+rather than inferred from the caller.
+
+This remains an authorization/idempotency scaffold. It does not claim token
+custody, cryptographic beneficiary authorization, atomic token settlement or
+multisig semantics: those primitives are not provided by the pinned SDK. The
+v2 deployment and proof helpers therefore write only `*-v2` artifacts and the
+frontend must opt into the v2 address/config explicitly. The shipped frontend
+defaults to v1; a verified v2 deployment is selected with
+`NEXT_PUBLIC_V2_CONTRACT_ADDRESS` plus `NEXT_PUBLIC_DEPLOYMENT_VERSION=v2`.
+In v2 mode, exposure requests bind the beneficiary to the connected wallet and
+include a fresh nonce and expiry.
+
 ## Testing layers
 
 | Layer | Command | What it proves |
 |---|---|---|
 | Lint | `genvm-lint check contracts/redemption_guard.py` | GenVM rules, runner header, schema loads |
-| Direct | `pytest tests/direct` (26 tests) | registration, limits, access control, URL validation, duplicates, source failures, malformed LLM output, all three outcomes, permitted and blocked exposure, the restricted-to-eligible cooldown, validator agree/disagree/error paths |
+| Direct | `pytest tests/direct` (35 tests) | v1 registration, limits, access control, URL validation, duplicates, source failures, malformed LLM output, all three outcomes, permitted and blocked exposure, plus v2 roles, canonical sources, expiry, pause, policy-version invalidation, caps, beneficiary binding, nonce replay, and the restricted-to-eligible cooldown |
 | Full consensus | `npm run test:studio` | real validators fetch the public fixture and agree; blocked exposure reverts on-chain |
 | Proof flows | `npm run deploy:demo` | the three required flows, read back from chain |
 | Browser E2E | `npm run test:ui` | the UI → Transaction Kit → Studio Next → state confirmation, for blocked, assessment, and permitted flows |

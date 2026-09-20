@@ -65,15 +65,17 @@ _VMContext.mock_llm = _mock_llm_as_text
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTRACT = str(ROOT / "contracts" / "redemption_guard.py")
+CONTRACT_V2 = str(ROOT / "contracts" / "redemption_guard_v2.py")
 EVIDENCE = ROOT / "frontend" / "public" / "evidence"
 HOST = "evidence.example.org"
 BASE = f"https://{HOST}/evidence"
 
-contract_header = Path(CONTRACT).read_text(encoding="utf-8").splitlines()[0]
-if GENVM_RUNNER_HASH not in contract_header:
-    raise RuntimeError(
-        f"Direct-test runner mismatch: expected py-genlayer:{GENVM_RUNNER_HASH} in the contract header"
-    )
+for contract_path in (CONTRACT, CONTRACT_V2):
+    contract_header = Path(contract_path).read_text(encoding="utf-8").splitlines()[0]
+    if GENVM_RUNNER_HASH not in contract_header:
+        raise RuntimeError(
+            f"Direct-test runner mismatch: expected py-genlayer:{GENVM_RUNNER_HASH} in {contract_path}"
+        )
 
 URL_OPERATIONAL = f"{BASE}/northwind-redemptions-operational.html"
 URL_SUSPENDED = f"{BASE}/halcyon-redemptions-suspended.html"

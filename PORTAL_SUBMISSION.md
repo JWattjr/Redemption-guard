@@ -61,6 +61,28 @@ It is an authorization prototype. There are no tokens, custody, swaps, or price 
   - Suspended (HLUSD): https://redemption-guard.vercel.app/evidence/halcyon-redemptions-suspended.html
   - Ambiguous (HLUSD): https://redemption-guard.vercel.app/evidence/halcyon-status-unclear.html
 
+## v2 hardening (not the v1 proof deployment)
+
+The repository now includes `contracts/redemption_guard_v2.py` as an additive
+opt-in contract. It keeps the same pinned GenVM runner and evidence
+normalization, while adding explicit admin/assessor/pauser roles, two-step
+ownership transfer, canonical required-source policies with increasing
+versions, assessment expiry, emergency pause, per-asset caps, and
+beneficiary/nonce/expiry replay guards. The restricted-to-eligible cooldown is
+unchanged.
+
+The v2 deployment and seed commands are `npm run deploy:v2` and `npm run
+seed:v2`; they write only `deployments/*-v2.json` and
+`frontend/lib/*v2.generated.json`. They must not be used to replace the v1
+address or proof records above. No v2 address or transaction hash is claimed
+here because this change does not authorize a live deployment.
+
+This is still safe authorization/idempotency scaffolding. The installed SDK
+does not provide a supported token adapter, signature-based beneficiary
+authorization, atomic token transfer, or multisig primitive, so v2 does not
+pretend to settle real tokens. A production adapter must supply and audit
+those boundaries separately.
+
 ## Three proof transactions (Studio Next, all FINALIZED, 5 initial validators each)
 
 Produced by `npm run deploy:demo` on 2026-09-19 and re-verified from chain with `npm run verify:proof`.

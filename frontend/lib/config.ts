@@ -11,9 +11,18 @@ export const STUDIO_NEXT = {
 
 const fromEnv = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS?.trim();
 
-export const CONTRACT_ADDRESS = (fromEnv && /^0x[0-9a-fA-F]{40}$/.test(fromEnv)
-  ? fromEnv
-  : deployment.contractAddress) as `0x${string}`;
+// v1 remains the default and keeps reading the committed v1 deployment. v2 is
+// deliberately a separate opt-in address/config so a frontend build cannot
+// silently replace the v1 proof board with an unverified deployment.
+const v2FromEnv = process.env.NEXT_PUBLIC_V2_CONTRACT_ADDRESS?.trim();
+export const V2_CONTRACT_ADDRESS = (v2FromEnv && /^0x[0-9a-fA-F]{40}$/.test(v2FromEnv) ? v2FromEnv : undefined) as
+  | `0x${string}`
+  | undefined;
+export const V2_CONFIGURED = Boolean(V2_CONTRACT_ADDRESS);
+const requestedVersion = process.env.NEXT_PUBLIC_DEPLOYMENT_VERSION?.trim().toLowerCase();
+export const DEPLOYMENT_VERSION = requestedVersion === "v2" && V2_CONTRACT_ADDRESS ? ("v2" as const) : ("v1" as const);
+
+export const CONTRACT_ADDRESS = (DEPLOYMENT_VERSION === "v2" ? V2_CONTRACT_ADDRESS : fromEnv && /^0x[0-9a-fA-F]{40}$/.test(fromEnv) ? fromEnv : deployment.contractAddress) as `0x${string}`;
 
 export const DEPLOYED_AT = deployment.deployedAt;
 

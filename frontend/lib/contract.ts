@@ -16,9 +16,11 @@ export type Assessment = {
   evidence_urls: string[];
   sources: SourceSummary[];
   policy_id: string;
+  source_policy_version?: number;
   requested_by: string;
   assessed_at: string;
   gate_open_at: string | null;
+  expires_at?: string | null;
 };
 
 export type Asset = {
@@ -32,6 +34,11 @@ export type Asset = {
   gate_open_at: string | null;
   gate_open: boolean;
   approved_exposure_units: string;
+  required_sources?: string[];
+  source_policy_version?: number;
+  exposure_cap_units?: string;
+  beneficiary_cap_units?: string;
+  remaining_exposure_units?: string;
 };
 
 export type Exposure = {
@@ -52,6 +59,9 @@ export type Policy = {
   max_urls: number;
   stale_after_days: number;
   restricted_to_eligible_cooldown_seconds: number;
+  roles?: string[];
+  default_assessment_validity_seconds?: number;
+  beneficiary_must_be_caller?: boolean;
 };
 
 export type Summary = {
@@ -60,6 +70,8 @@ export type Summary = {
   exposure_request_count: number;
   status_counts: Record<Status, number>;
   eligible_assets: string[];
+  paused?: boolean;
+  pause_reason?: string;
 };
 
 export type Dashboard = {

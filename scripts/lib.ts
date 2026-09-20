@@ -15,6 +15,12 @@ export const ENV_FILE = resolve(ROOT, ".env");
 export const DEPLOYMENT_FILE = resolve(ROOT, "deployments", "studio-next.json");
 export const PROOF_FILE = resolve(ROOT, "deployments", "demo-proof.json");
 export const FRONTEND_DEPLOYMENT_FILE = resolve(ROOT, "frontend", "lib", "deployment.generated.json");
+// v2 artifacts are intentionally separate. Never point v2 helpers at v1 files:
+// the v1 address and finalized proof records are part of the release evidence.
+export const V2_DEPLOYMENT_FILE = resolve(ROOT, "deployments", "studio-next-v2.json");
+export const V2_PROOF_FILE = resolve(ROOT, "deployments", "demo-proof-v2.json");
+export const V2_FRONTEND_DEPLOYMENT_FILE = resolve(ROOT, "frontend", "lib", "deployment.v2.generated.json");
+export const V2_FRONTEND_PROOF_FILE = resolve(ROOT, "frontend", "lib", "proof.v2.generated.json");
 
 loadEnv({ path: ENV_FILE, quiet: true });
 

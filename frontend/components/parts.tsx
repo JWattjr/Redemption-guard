@@ -132,6 +132,18 @@ export function AssetRow({
           <dt>Approved exposure</dt>
           <dd className="mono">{groupUnits(asset.approved_exposure_units)} units</dd>
         </div>
+        {asset.remaining_exposure_units && (
+          <div>
+            <dt>Remaining cap</dt>
+            <dd className="mono">{groupUnits(asset.remaining_exposure_units)} units</dd>
+          </div>
+        )}
+        {latest?.expires_at && (
+          <div>
+            <dt>Assessment valid</dt>
+            <dd>{utcTime(latest.expires_at)}</dd>
+          </div>
+        )}
       </dl>
 
       <div className="row__notes">
@@ -182,12 +194,14 @@ export function PolicyPanel({ policy }: { policy?: Policy }) {
             {Math.round((policy.restricted_to_eligible_cooldown_seconds ?? 3600) / 60)} minutes.
           </li>
         )}
+        {policy?.roles && <li>Administrative actions use explicit {policy.roles.join(", ")} roles.</li>}
+        {policy?.beneficiary_must_be_caller && <li>Exposure authorizations bind the beneficiary to the requesting wallet.</li>}
       </ul>
     </section>
   );
 }
 
-export function ContractPanel({ address, owner }: { address: string; owner?: string }) {
+export function ContractPanel({ address, owner, v2Address, deploymentVersion = "v1" }: { address: string; owner?: string; v2Address?: string; deploymentVersion?: "v1" | "v2" }) {
   return (
     <section className="plate" aria-labelledby="contract-title">
       <div className="plate__head">
@@ -212,6 +226,14 @@ export function ContractPanel({ address, owner }: { address: string; owner?: str
         <div>
           <dt>Network</dt>
           <dd>GenLayer Studio Next</dd>
+        </div>
+        <div>
+          <dt>Deployment</dt>
+          <dd>{deploymentVersion} active · v1 proof preserved</dd>
+        </div>
+        <div>
+          <dt>v2 config</dt>
+          <dd className="mono break">{v2Address ? v2Address : "not configured (opt-in only)"}</dd>
         </div>
         <div>
           <dt>Runner</dt>
