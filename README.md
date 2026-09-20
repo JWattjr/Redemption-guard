@@ -58,30 +58,59 @@ npm ci
 ```
 
 ```bash
-uv venv --python 3.12 .venv && uv pip install --python .venv/Scripts/python.exe -r requirements.txt
+npm run setup:python
 ```
 
-(On macOS/Linux use `.venv/bin/python`.)
+`npm run setup:python` creates or repairs `.venv`, ensures it has pip, verifies
+Python 3.12+, and installs the exact pins from `requirements.txt` (including
+`genlayer-test[sim]==0.30.0rc2`, `genlayer-py==0.19.0rc2`, and
+`genvm-linter==0.11.1rc2`). It uses `uv` when available and otherwise falls
+back to the platform Python 3.12 launcher. The repository's npm Python
+commands always invoke this venv directly, so a globally installed
+`genlayer-test` cannot be selected accidentally.
 
 ## Verify
 
 ```bash
-genvm-lint check contracts/redemption_guard.py
+npm run check
 ```
 
 ```bash
-python -m pytest tests/direct -q
+npm run verify:proof
 ```
 
-```bash
-npm run lint && npm run typecheck && npm run build
-```
+`npm run check` runs contract lint, all direct tests, frontend lint, TypeScript
+checking, and the production build. `npm run verify:proof` remains separate
+because it reads the live Studio Next deployment and requires network access.
 
 ```bash
 npm run test:studio
 ```
 
-On Windows, set `PYTHONIOENCODING=utf-8` for `genvm-lint`, which prints a Unicode check mark. `tests/direct/conftest.py` has two small documented shims for known `genlayer-test 0.30.0rc2` defects: Windows temp-file deletion, and mocked LLM JSON handed to the v0.3 std lib as an object rather than as text.
+On Windows, the Python runner sets `PYTHONIOENCODING=utf-8` for the linter,
+which prints a Unicode check mark. `tests/direct/conftest.py` pins the
+`v0.6.0-rc5` GenVM bundle and has two small documented shims for known
+`genlayer-test 0.30.0rc2` defects: Windows temp-file deletion, and mocked LLM
+JSON handed to the v0.3 std lib as an object rather than as text.
+
+## Fee profile
+
+`frontend/fee-profile.json` is a checked-in representative profile for Studio
+Next chain 61997. It is generated from finalized fee-accounting receipts for
+the committed deploy, asset-registration, assessment, and exposure proof
+flows:
+
+```bash
+npm run profile:fees
+```
+
+The frontend passes this profile to Transaction Kit, which uses its measured
+allocations as suggestions while still reading current fee prices and caps
+from Studio Next at signing time. The deploy, seed, and smoke scripts retain
+their simulation-backed `estimateTransactionFeesForWrite` path and fall back
+to the live network policy when a simulation (for example, an expected revert)
+cannot produce a quote. Regenerate the profile whenever the contract, GenVM,
+Studio, or fee policy changes.
 
 ## Deploy and seed (Studio Next may reset)
 

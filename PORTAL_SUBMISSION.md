@@ -1,5 +1,26 @@
 # Redemption Guard — GenLayer Portal submission
 
+## Portal fields (paste-ready)
+
+**Title:** Redemption Guard — Stablecoin Redemption Monitor
+
+**One-liner (157 characters):** Consensus-gated stablecoin redemption monitoring that authorizes exposure only after validators agree redemptions work, with a recovery-cooldown kill switch.
+
+**Description:** Redemption Guard monitors fictional stablecoins through issuer evidence pages. GenLayer validators independently fetch and judge the evidence against a frozen redemption policy; only consensus `ELIGIBLE` opens the deterministic exposure gate, while `RESTRICTED` recovery remains closed for one hour. This is stablecoin redemption monitoring, exposure authorization, and a fail-closed recovery-cooldown kill switch—not a generic risk classifier.
+
+**Links:**
+
+- Live app: https://redemption-guard.vercel.app
+- GitHub: https://github.com/JWattjr/Redemption-guard
+- Submission write-up: https://github.com/JWattjr/Redemption-guard/blob/main/PORTAL_SUBMISSION.md
+- Contract explorer: https://explorer-studio-dev.genlayer.com/address/0x7D77A1742Ba479c1EEBE867CB1EAbCc1acF44231
+
+**Contract address:** `0x7D77A1742Ba479c1EEBE867CB1EAbCc1acF44231`
+
+**Network:** GenLayer Studio Dev / Studio Next · chain `61997`
+
+**Tags:** stablecoin redemption monitoring, exposure authorization, treasury controls, consensus-gated automation, recovery cooldown, fail-closed safety, intelligent contracts, GenLayer Studio Next
+
 ## One line
 
 A treasury can only take new exposure to a stablecoin after independent GenLayer validators read the issuer's own redemption evidence and agree, under a frozen policy, that ordinary redemptions are working.

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createTransactionKit, type TransactionKit } from "@genlayer/transaction-kit";
 import { studioDevnet } from "genlayer-js/chains";
 import { STUDIO_NEXT } from "./config";
+import feeProfile from "../fee-profile.json";
 
 type Eip1193 = {
   request(args: { method: string; params?: unknown[] }): Promise<unknown>;
@@ -140,7 +141,7 @@ export function useWallet(): WalletState {
 
   const kit = useMemo(() => {
     if (!address || !onStudioNext || typeof window === "undefined" || !window.ethereum) return undefined;
-    return createTransactionKit({ chain: studioDevnet, provider: window.ethereum, account: address });
+    return createTransactionKit({ chain: studioDevnet, provider: window.ethereum, account: address, suggestions: feeProfile });
   }, [address, onStudioNext]);
 
   return { available, address, chainId, onStudioNext, connecting, error, kit, connect, switchNetwork, requestTestFunds };

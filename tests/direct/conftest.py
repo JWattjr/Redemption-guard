@@ -9,7 +9,9 @@ import pytest
 
 # Pin the GenVM bundle that Studio Next (genlayer-studio v0.123.0-rc.7) runs,
 # so direct tests load the same py-genlayer runner the contract header names.
-os.environ.setdefault("GENVM_VERSION", "v0.6.0-rc5")
+DIRECT_GENVM_VERSION = "v0.6.0-rc5"
+GENVM_RUNNER_HASH = "5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng"
+os.environ["GENVM_VERSION"] = DIRECT_GENVM_VERSION
 
 if sys.platform == "win32":
     # gltest 0.30.0rc2 unlinks its stdin temp file while fd 0 still holds it.
@@ -66,6 +68,12 @@ CONTRACT = str(ROOT / "contracts" / "redemption_guard.py")
 EVIDENCE = ROOT / "frontend" / "public" / "evidence"
 HOST = "evidence.example.org"
 BASE = f"https://{HOST}/evidence"
+
+contract_header = Path(CONTRACT).read_text(encoding="utf-8").splitlines()[0]
+if GENVM_RUNNER_HASH not in contract_header:
+    raise RuntimeError(
+        f"Direct-test runner mismatch: expected py-genlayer:{GENVM_RUNNER_HASH} in the contract header"
+    )
 
 URL_OPERATIONAL = f"{BASE}/northwind-redemptions-operational.html"
 URL_SUSPENDED = f"{BASE}/halcyon-redemptions-suspended.html"

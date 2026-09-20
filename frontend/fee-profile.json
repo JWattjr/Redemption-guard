@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "chainId": 61997,
+  "network": "studio-dev",
+  "measuredAt": "2026-09-20T14:25:59.262Z",
+  "methods": {
+    "register_asset": {
+      "leaderTimeunitsAllocation": "100",
+      "validatorTimeunitsAllocation": "200",
+      "executionBudgetPerRound": "94626300000000",
+      "totalMessageFees": "0",
+      "rotationsPerRound": "3"
+    },
+    "assess_asset": {
+      "leaderTimeunitsAllocation": "100",
+      "validatorTimeunitsAllocation": "200",
+      "executionBudgetPerRound": "97552200000000",
+      "totalMessageFees": "0",
+      "rotationsPerRound": "3"
+    },
+    "request_exposure": {
+      "leaderTimeunitsAllocation": "100",
+      "validatorTimeunitsAllocation": "200",
+      "executionBudgetPerRound": "94625700000000",
+      "totalMessageFees": "0",
+      "rotationsPerRound": "3"
+    }
+  },
+  "deploy": {
+    "leaderTimeunitsAllocation": "100",
+    "validatorTimeunitsAllocation": "200",
+    "executionBudgetPerRound": "94873200000000",
+    "totalMessageFees": "0",
+    "rotationsPerRound": "3"
+  }
+}

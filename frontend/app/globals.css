@@ -31,6 +31,17 @@
   --link: #7fb2ff;
   --focus: #f0a93b;
 
+  /* Intentional transparency tokens: the flap seam is a dark 55% ink line;
+     the dialog scrim is a 70% enamel overlay. Keeping them named makes the
+     two translucent surfaces auditable alongside the rest of the palette. */
+  --overlay-flap-seam: rgb(0 0 0 / 55%);
+  --overlay-dialog-scrim: rgb(6 12 20 / 70%);
+
+  /* Small type exceptions are named so they stay aligned with the board's
+     display scale: outcome/flap emphasis and compact mobile tickers. */
+  --type-emphasis: 17px;
+  --type-mobile-ticker: 34px;
+
   --sans: var(--font-sans), "Barlow", system-ui, sans-serif;
   --strip: var(--font-strip), "Barlow Condensed", var(--sans);
   --mono: var(--font-mono), "Spline Sans Mono", ui-monospace, monospace;
@@ -187,9 +198,9 @@ h2 { font-size: 16px; }
 
 /* the gate: a split-flap cell */
 .flap { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 148px; min-height: 40px; padding: 0 14px; overflow: hidden; background: #060c14; border: 1px solid var(--b-rule); }
-.flap::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(0, 0, 0, 0.55); }
+.flap::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--overlay-flap-seam); }
 .flap__leaf { position: absolute; inset: 0; background: var(--board); transform-origin: center top; }
-.flap__text { position: relative; font: 700 17px/1 var(--display); letter-spacing: 0.14em; }
+.flap__text { position: relative; font: 700 var(--type-emphasis)/1 var(--display); letter-spacing: 0.14em; }
 .flap--open .flap__text { color: var(--b-go); }
 .flap--closed .flap__text { color: var(--b-stop); }
 
@@ -255,7 +266,7 @@ h2 { font-size: 16px; }
 .outcome--eligible { border-top-color: var(--signal-go); }
 .outcome--restricted { border-top-color: var(--signal-stop); }
 .outcome--insufficient { border-top-color: var(--signal-hold); }
-.outcome__title { display: flex; align-items: center; gap: 10px; font-size: 17px; }
+.outcome__title { display: flex; align-items: center; gap: 10px; font-size: var(--type-emphasis); }
 .outcome__glyph { display: grid; place-items: center; width: 30px; height: 30px; flex: none; color: var(--b-ink); background: var(--board); border: 1px solid var(--b-rule); }
 .outcome--eligible .outcome__glyph { color: var(--b-go); }
 .outcome--restricted .outcome__glyph { color: var(--b-stop); }
@@ -316,7 +327,7 @@ h2 { font-size: 16px; }
 
 /* ---------- transaction dialog ---------- */
 .txdialog { width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 48px); padding: 18px; color: var(--ink); background: var(--chassis); border: 1px solid var(--rule); }
-.txdialog::backdrop { background: rgba(6, 12, 20, 0.7); }
+.txdialog::backdrop { background: var(--overlay-dialog-scrim); }
 .txdialog__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
 .txdialog .gltk-root {
   --gltk-bg: var(--chassis);
@@ -377,6 +388,6 @@ h2 { font-size: 16px; }
   .panel__foot .btn { width: 100%; }
   .row__foot .btn { width: 100%; }
   .hint { justify-content: flex-start; }
-  .asset__ticker { font-size: 34px; }
+  .asset__ticker { font-size: var(--type-mobile-ticker); }
   .btn, .chip, .picker__item { min-height: 44px; }
 }
