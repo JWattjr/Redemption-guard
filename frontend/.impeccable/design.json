@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-20T00:00:00.000Z",
+  "title": "Design System: Redemption Guard",
+  "extensions": {
+    "colorMeta": {
+      "enamel": { "role": "neutral", "displayName": "Enamel Midnight", "canonical": "#0e1622", "tonalRamp": ["#05080c", "#0a111a", "#0e1622", "#18212f", "#26344a", "#3d5170", "#7089ad", "#c3d1e2"] },
+      "chassis": { "role": "neutral", "displayName": "Steel Chassis", "canonical": "#18212f", "tonalRamp": ["#080b10", "#0f141d", "#18212f", "#1f2a3a", "#2b3646", "#46566e", "#7d8ea6", "#ccd6e3"] },
+      "chassis-2": { "role": "neutral", "displayName": "Chassis Raised", "canonical": "#1f2a3a", "tonalRamp": ["#0a0e14", "#141b25", "#1f2a3a", "#2b3646", "#3a4a60", "#556884", "#8497ae", "#d2dbe6"] },
+      "board": { "role": "neutral", "displayName": "Matte Board", "canonical": "#0a111a", "tonalRamp": ["#03070b", "#060c14", "#0a111a", "#101a26", "#1b2534", "#31405a", "#647a9a", "#bccadd"] },
+      "rule": { "role": "neutral", "displayName": "Hairline Rule", "canonical": "#2b3646", "tonalRamp": ["#0b0f15", "#151c26", "#212c3b", "#2b3646", "#3a4759", "#55657c", "#8b99ac", "#d3dae3"] },
+      "rule-soft": { "role": "neutral", "displayName": "Soft Divider", "canonical": "#212c3b", "tonalRamp": ["#090d12", "#131a23", "#212c3b", "#2b3646", "#3a4759", "#55657c", "#8b99ac", "#d3dae3"] },
+      "ink": { "role": "neutral", "displayName": "Enamel White", "canonical": "#eef2f7", "tonalRamp": ["#151a21", "#2b333e", "#454f5d", "#626d7d", "#8a97a9", "#b6c2d2", "#d5dee8", "#eef2f7"] },
+      "ink-2": { "role": "neutral", "displayName": "Dim Ink", "canonical": "#b6c2d2", "tonalRamp": ["#141920", "#28303b", "#414b59", "#5d6878", "#8a97a9", "#b6c2d2", "#d3dce7", "#edf1f6"] },
+      "ink-3": { "role": "neutral", "displayName": "Faint Ink", "canonical": "#8a97a9", "tonalRamp": ["#12161c", "#242c36", "#3c4551", "#57616f", "#8a97a9", "#aab5c4", "#ccd4de", "#e9edf2"] },
+      "sodium": { "role": "primary", "displayName": "Sodium Amber", "canonical": "#f0a93b", "tonalRamp": ["#2a1c07", "#452d0b", "#674312", "#8c5c19", "#b47823", "#d9942e", "#f0a93b", "#ffd08a"] },
+      "sodium-lit": { "role": "primary", "displayName": "Lit Sodium", "canonical": "#ffbe55", "tonalRamp": ["#2d200b", "#4a3410", "#6d4c17", "#946720", "#bd852c", "#e3a33a", "#ffbe55", "#ffdca4"] },
+      "sodium-dim": { "role": "primary", "displayName": "Dim Sodium", "canonical": "#7a5a26", "tonalRamp": ["#1b1408", "#2e2110", "#453118", "#5e4320", "#7a5a26", "#a2783a", "#cb9b58", "#ecc797"] },
+      "signal-go": { "role": "secondary", "displayName": "Signal Green", "canonical": "#35c77a", "tonalRamp": ["#04230f", "#073a1c", "#0b5429", "#107038", "#188d49", "#23ab5d", "#35c77a", "#8fe6b6"] },
+      "signal-stop": { "role": "secondary", "displayName": "Signal Red", "canonical": "#ff6f56", "tonalRamp": ["#2a0c06", "#45160d", "#642115", "#872e1e", "#ad3f2a", "#d45239", "#ff6f56", "#ffb3a3"] },
+      "signal-hold": { "role": "secondary", "displayName": "Signal Hold", "canonical": "#f0a93b", "tonalRamp": ["#2a1c07", "#452d0b", "#674312", "#8c5c19", "#b47823", "#d9942e", "#f0a93b", "#ffd08a"] },
+      "idle": { "role": "secondary", "displayName": "Idle Grey", "canonical": "#7c8799", "tonalRamp": ["#10141a", "#1f252e", "#333b46", "#4b5563", "#657081", "#7c8799", "#a7b0bd", "#dde2e9"] },
+      "go-ground": { "role": "secondary", "displayName": "Eligible Ground", "canonical": "#102a1f", "tonalRamp": ["#05100b", "#0a1d15", "#102a1f", "#17402f", "#215841", "#2d7256", "#3c8f6d", "#8fc7b0"] },
+      "stop-ground": { "role": "secondary", "displayName": "Restricted Ground", "canonical": "#2d1712", "tonalRamp": ["#120806", "#20100c", "#2d1712", "#44221a", "#5d2f23", "#7a3e2e", "#9c503b", "#d49e8c"] },
+      "hold-ground": { "role": "secondary", "displayName": "Hold Ground", "canonical": "#2a1f0e", "tonalRamp": ["#110d06", "#1d160a", "#2a1f0e", "#3f2f15", "#57411d", "#725526", "#936d31", "#cfb086"] },
+      "idle-ground": { "role": "secondary", "displayName": "Idle Ground", "canonical": "#1b2534", "tonalRamp": ["#080c11", "#11171f", "#1b2534", "#273348", "#36455d", "#4a5c78", "#6d8099", "#bcc8d8"] },
+      "link": { "role": "tertiary", "displayName": "Link Blue", "canonical": "#7fb2ff", "tonalRamp": ["#0a1930", "#12294c", "#1b3a6b", "#254d8c", "#3364b0", "#4b80d2", "#7fb2ff", "#c5dcff"] },
+      "focus": { "role": "primary", "displayName": "Focus Sodium", "canonical": "#f0a93b", "tonalRamp": ["#2a1c07", "#452d0b", "#674312", "#8c5c19", "#b47823", "#d9942e", "#f0a93b", "#ffd08a"] },
+      "board-ink": { "role": "neutral", "displayName": "Board Ink", "canonical": "#eef2f7", "tonalRamp": ["#151a21", "#2b333e", "#454f5d", "#626d7d", "#8a97a9", "#b6c2d2", "#d5dee8", "#eef2f7"] },
+      "board-ink-2": { "role": "neutral", "displayName": "Board Ink Dim", "canonical": "#b6c2d2", "tonalRamp": ["#141920", "#28303b", "#414b59", "#5d6878", "#8a97a9", "#b6c2d2", "#d3dce7", "#edf1f6"] },
+      "board-ink-3": { "role": "neutral", "displayName": "Board Ink Faint", "canonical": "#8a97a9", "tonalRamp": ["#12161c", "#242c36", "#3c4551", "#57616f", "#8a97a9", "#aab5c4", "#ccd4de", "#e9edf2"] },
+      "board-rule": { "role": "neutral", "displayName": "Board Rule", "canonical": "#2b3646", "tonalRamp": ["#0b0f15", "#151c26", "#212c3b", "#2b3646", "#3a4759", "#55657c", "#8b99ac", "#d3dae3"] },
+      "board-row-selected": { "role": "neutral", "displayName": "Selected Row", "canonical": "#16243a", "tonalRamp": ["#070b12", "#0e1724", "#16243a", "#1f3352", "#2b456c", "#3c5c8d", "#5f80b4", "#b5c7e0"] },
+      "board-flap-face": { "role": "neutral", "displayName": "Flap Face", "canonical": "#060c14", "tonalRamp": ["#020407", "#04080e", "#060c14", "#0a111a", "#101a26", "#1b2534", "#3a4c66", "#9cabc2"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Board Display", "purpose": "The asset ticker on a board row. 34px below 720px. Nothing else uses this size." },
+      "headline": { "displayName": "Signage Headline", "purpose": "Service name; 24px cut for gate-check and proof tickers, 19px for station numerals, 17px for flap lettering." },
+      "title": { "displayName": "Section Title", "purpose": "The board's own heading." },
+      "subtitle": { "displayName": "Panel Title", "purpose": "Station and rail-plate headings." },
+      "body": { "displayName": "Body", "purpose": "Prose. Ledes cap at 68ch, reasoning blocks at 78ch." },
+      "body-small": { "displayName": "Body Small", "purpose": "Dense panel copy, definition values, notes." },
+      "label": { "displayName": "Stencil Label", "purpose": "Stencil IDs, definition terms, field labels, board column headers." },
+      "strip": { "displayName": "Strip Label", "purpose": "Issuer lines, posted status badges, network badge, domain marks." },
+      "mono": { "displayName": "Mono", "purpose": "Hashes, addresses, amounts, reason codes, posted timestamps, asset picker." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "flap-post", "value": "rotateX(0deg) → rotateX(-92deg) over 260ms cubic-bezier(0.25, 0.9, 0.3, 1)", "purpose": "The split-flap gate leaf throwing. Keyed on gate state so it replays only when the gate actually changes." },
+      { "name": "spin", "value": "rotate(360deg) over 900ms linear infinite", "purpose": "The refresh icon inside a busy ghost button." },
+      { "name": "control-settle", "value": "border-color 160ms ease, background-color 160ms ease, color 160ms ease", "purpose": "Buttons, chips, picker items and inputs settling into hover/focus." },
+      { "name": "row-settle", "value": "background-color 180ms ease, box-shadow 180ms ease", "purpose": "A board row taking or losing selection." },
+      { "name": "motion-gate", "value": "@media (prefers-reduced-motion: no-preference)", "purpose": "Every animation and transition in the system lives inside this query. There is no motion outside it." }
+    ],
+    "breakpoints": [
+      { "name": "stack", "value": "1120px" },
+      { "name": "handheld", "value": "720px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one paid-for action in a station: submit evidence, request exposure, connect wallet.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Run consensus assessment</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 16px; font: 600 13px/1 'Barlow', system-ui, sans-serif; letter-spacing: 0.02em; border-radius: 0; cursor: pointer; transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease; } .ds-btn-primary { background: #f0a93b; border: 1px solid #f0a93b; color: #0a111a; } .ds-btn-primary:hover { background: #ffbe55; border-color: #ffbe55; } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: 2px solid #f0a93b; outline-offset: 3px; }"
+    },
+    {
+      "name": "Default Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Chassis-filled secondary action; hover shifts the hairline to sodium.",
+      "html": "<button class=\"ds-btn ds-btn-default\">Close</button>",
+      "css": ".ds-btn-default { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 16px; font: 600 13px/1 'Barlow', system-ui, sans-serif; letter-spacing: 0.02em; color: #eef2f7; background: #1f2a3a; border: 1px solid #2b3646; border-radius: 0; cursor: pointer; transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease; } .ds-btn-default:hover { border-color: #f0a93b; } .ds-btn-default:active { transform: translateY(1px); } .ds-btn-default:focus-visible { outline: 2px solid #f0a93b; outline-offset: 3px; } .ds-btn-default:disabled { cursor: not-allowed; color: #8a97a9; background: transparent; border-style: dashed; }"
+    },
+    {
+      "name": "Posted Status Badge",
+      "kind": "chip",
+      "refersTo": "posted-eligible",
+      "description": "The verbatim contract token with its authored icon. Never colour alone; ships beside a state bar.",
+      "html": "<span class=\"ds-posted ds-posted-eligible\"><svg class=\"ds-sicon\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M2.5 8.5 6.5 12.5 13.5 3.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>ELIGIBLE</span>",
+      "css": ".ds-posted { display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; font: 500 13.5px/1.2 'Barlow Condensed', 'Barlow', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; border: 1px solid currentColor; border-radius: 0; } .ds-sicon { width: 15px; height: 15px; flex: none; } .ds-posted-eligible { color: #35c77a; background: #102a1f; }"
+    },
+    {
+      "name": "State Bar",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "The line form of a status: solid ELIGIBLE, dashed INSUFFICIENT_EVIDENCE, hatched-struck RESTRICTED. Survives greyscale.",
+      "html": "<svg class=\"ds-statebar ds-statebar-restricted\" viewBox=\"0 0 48 10\" preserveAspectRatio=\"none\" aria-hidden=\"true\"><g fill=\"currentColor\"><rect x=\"0\" y=\"3\" width=\"48\" height=\"4\" opacity=\"0.45\"/><rect x=\"0\" y=\"0\" width=\"3\" height=\"10\"/><rect x=\"9\" y=\"0\" width=\"3\" height=\"10\"/><rect x=\"18\" y=\"0\" width=\"3\" height=\"10\"/><rect x=\"27\" y=\"0\" width=\"3\" height=\"10\"/><rect x=\"36\" y=\"0\" width=\"3\" height=\"10\"/><rect x=\"45\" y=\"0\" width=\"3\" height=\"10\"/></g></svg>",
+      "css": ".ds-statebar { display: block; width: 100%; max-width: 132px; height: 10px; } .ds-statebar-eligible { color: #35c77a; } .ds-statebar-restricted { color: #ff6f56; } .ds-statebar-insufficient { color: #f0a93b; } .ds-statebar-none { color: #7c8799; }"
+    },
+    {
+      "name": "Split-Flap Gate Cell",
+      "kind": "custom",
+      "refersTo": "gate-flap",
+      "description": "The signature component: the board posting the consequence of the status. The leaf is keyed on gate state and replays only on real change.",
+      "html": "<span class=\"ds-flap ds-flap-open\"><span class=\"ds-flap-leaf\" aria-hidden=\"true\"></span><span class=\"ds-flap-text\">GATE OPEN</span></span>",
+      "css": ".ds-flap { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 148px; min-height: 40px; padding: 0 14px; overflow: hidden; background: #060c14; border: 1px solid #2b3646; border-radius: 0; } .ds-flap::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(0,0,0,0.55); } .ds-flap-leaf { position: absolute; inset: 0; background: #0a111a; transform-origin: center top; } .ds-flap-text { position: relative; font: 700 17px/1 'Barlow Condensed', 'Barlow', sans-serif; letter-spacing: 0.14em; } .ds-flap-open .ds-flap-text { color: #35c77a; } .ds-flap-closed .ds-flap-text { color: #ff6f56; } @media (prefers-reduced-motion: no-preference) { .ds-flap-leaf { animation: ds-flap-post 260ms cubic-bezier(0.25,0.9,0.3,1) 1 both; } } @keyframes ds-flap-post { 0% { transform: rotateX(0deg); } 100% { transform: rotateX(-92deg); } }"
+    },
+    {
+      "name": "Board Row",
+      "kind": "card",
+      "refersTo": "board-row",
+      "description": "One asset posted on the board: lamp, condensed ticker, name, issuer. Board-fixed inks throughout.",
+      "html": "<article class=\"ds-row ds-row-eligible\"><span class=\"ds-row-lamp\" aria-hidden=\"true\"></span><div><div class=\"ds-ticker\">NWUSD</div><div class=\"ds-row-name\">Northwater Dollar</div><div class=\"ds-row-issuer\">Northwater Reserve Co.</div></div></article>",
+      "css": ".ds-row { display: flex; align-items: flex-start; gap: 12px; padding: 16px; color: #eef2f7; background: #0a111a; border-bottom: 1px solid #2b3646; border-radius: 0; transition: background-color 180ms ease, box-shadow 180ms ease; } .ds-row:hover { background-color: #16243a; box-shadow: inset 0 0 0 1px #2b3646; } .ds-row-lamp { width: 8px; height: 8px; margin-top: 12px; flex: none; background: #7c8799; } .ds-row-eligible .ds-row-lamp { background: #35c77a; } .ds-ticker { font: 700 40px/0.95 'Barlow Condensed', 'Barlow', sans-serif; letter-spacing: 0.05em; color: #f0a93b; } .ds-row-name { margin-top: 7px; font: 600 14px/1.4 'Barlow', sans-serif; } .ds-row-issuer { font: 500 12px/1.35 'Barlow Condensed', 'Barlow', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; color: #8a97a9; }"
+    },
+    {
+      "name": "Evidence Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Recessed board-plane field for evidence URLs and amounts; amber caret, sodium focus.",
+      "html": "<input class=\"ds-input\" type=\"url\" placeholder=\"https://issuer.example/reserves\" />",
+      "css": ".ds-input { width: 100%; min-height: 44px; padding: 10px 12px; font: 400 13.5px/1.55 'Barlow', system-ui, sans-serif; color: #eef2f7; background: #0a111a; border: 1px solid #2b3646; border-radius: 0; caret-color: #f0a93b; transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease; } .ds-input::placeholder { color: #8a97a9; } .ds-input:focus-visible { outline: 2px solid #f0a93b; outline-offset: 2px; border-color: #f0a93b; } .ds-input.is-error { border-color: #ff6f56; }"
+    },
+    {
+      "name": "Asset Picker",
+      "kind": "nav",
+      "refersTo": "picker-item",
+      "description": "Segmented mono control that selects which asset a station acts on. Active segment takes the sodium fill.",
+      "html": "<div class=\"ds-picker\"><button class=\"ds-picker-item is-active\">NWUSD</button><button class=\"ds-picker-item\">HLUSD</button></div>",
+      "css": ".ds-picker { display: inline-flex; border: 1px solid #2b3646; border-radius: 0; } .ds-picker-item { min-height: 38px; padding: 0 13px; font: 500 13px/1 'Spline Sans Mono', ui-monospace, monospace; color: #b6c2d2; background: #1f2a3a; border: 0; cursor: pointer; transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease; } .ds-picker-item + .ds-picker-item { border-left: 1px solid #2b3646; } .ds-picker-item:hover { color: #eef2f7; } .ds-picker-item.is-active { color: #0a111a; background: #f0a93b; } .ds-picker-item:focus-visible { outline: 2px solid #f0a93b; outline-offset: -4px; }"
+    },
+    {
+      "name": "Fixture Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Loads a synthetic reviewer fixture; the square LED carries the fixture's own condition.",
+      "html": "<button class=\"ds-chip ds-chip-operational\"><span class=\"ds-chip-led\" aria-hidden=\"true\"></span>Reserves attestation<span class=\"ds-chip-asset\">NWUSD</span></button>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 11px; font: 500 13px/1 'Barlow', system-ui, sans-serif; color: #b6c2d2; background: transparent; border: 1px solid #2b3646; border-radius: 0; cursor: pointer; transition: border-color 160ms ease, color 160ms ease; } .ds-chip:hover { color: #eef2f7; border-color: #f0a93b; } .ds-chip-led { width: 8px; height: 8px; background: #7c8799; } .ds-chip-operational .ds-chip-led { background: #35c77a; } .ds-chip-asset { font-size: 11.5px; color: #8a97a9; }"
+    },
+    {
+      "name": "Station Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "A numbered station on the service route: 2px sodium top rule, numeral on the board plane, stencil ID strip.",
+      "html": "<section class=\"ds-panel ds-panel-station\"><div class=\"ds-panel-head\"><h2 class=\"ds-step\"><span class=\"ds-step-num\">1</span>Submit evidence</h2><span class=\"ds-stencil\">Station 01</span></div><p class=\"ds-lede\">Validators fetch these URLs themselves and must agree on one status.</p></section>",
+      "css": ".ds-panel { background: #18212f; border: 1px solid #2b3646; border-radius: 0; padding: 18px; color: #eef2f7; } .ds-panel-station { border-top: 2px solid #f0a93b; } .ds-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; } .ds-step { display: flex; align-items: center; gap: 10px; margin: 0; font: 600 16px/1.3 'Barlow', system-ui, sans-serif; letter-spacing: -0.01em; } .ds-step-num { display: grid; place-items: center; width: 30px; height: 30px; font: 700 19px/1 'Barlow Condensed', 'Barlow', sans-serif; color: #f0a93b; background: #0a111a; border: 1px solid #2b3646; } .ds-stencil { font: 600 11px/1 'Barlow Condensed', 'Barlow', sans-serif; letter-spacing: 0.16em; text-transform: uppercase; color: #8a97a9; } .ds-lede { margin: 0; color: #b6c2d2; font-size: 14px; max-width: 68ch; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Concourse Status Board",
+    "overview": "This is a public service board for money. The ground is enamel midnight, the panels are steel chassis, and the one object that matters — the board — is a recessed matte plane carrying one dense row per asset. A reader standing back from the screen should get the answer before they get the interface: which asset is boarding, which is held. Everything else on the page stays small, even, and subordinate.\n\nThere is one committed ground. color-scheme: dark is unconditional and there is no light ambient: a service board is dark in any hall. Anything mounted on the board carries its own board-fixed inks (the board-* tokens) so it never follows the surrounding surface — which is why the row, the gate cell, the policy plaque and the evidence inputs read identically wherever they sit.\n\nThe world is cool and serious, never cute. It refuses rounded status cards on a pale ground, and it refuses pixel or bitmap lettering outright; the signage voice is Barlow Condensed 700 tracked caps, the condensed grotesque real flap boards use. Colour never carries meaning alone: every status reads as a verbatim contract word, an authored icon, and a line form.",
+    "keyCharacteristics": [
+      "Enamel-midnight ground, steel chassis panels, one recessed matte board",
+      "Square corners (0px radius), 1px hairline rules, no gradients, no glow",
+      "Sodium amber as the single accent; three signal hues reserved for state",
+      "Condensed 700 tracked caps for board display lettering; mono for hashes, amounts, addresses",
+      "Status carried three ways: word, icon, line form",
+      "Motion limited to the split-flap throw and one busy spinner, both inside prefers-reduced-motion: no-preference"
+    ],
+    "rules": [
+      { "name": "The One Lamp Rule", "body": "Sodium amber is the only accent. If a surface needs a second accent, it needs less content, not another hue.", "section": "colors" },
+      { "name": "The Board-Fixed Ink Rule", "body": "Anything mounted on the matte board uses the board-* tokens, never the page inks. The board does not follow the surface around it.", "section": "colors" },
+      { "name": "The Three-Way Status Rule", "body": "A status is never carried by colour alone. It reads as the verbatim contract token (ELIGIBLE / RESTRICTED / INSUFFICIENT_EVIDENCE), an authored icon, and a line form — solid bar for ELIGIBLE, dashed for INSUFFICIENT_EVIDENCE, hatched-struck for RESTRICTED. All three survive greyscale.", "section": "colors" },
+      { "name": "The No Bitmap Rule", "body": "No pixel, bitmap, or decorative display face, ever. The signage voice is condensed grotesque caps; a pixel face was built once and removed on sight.", "section": "typography" },
+      { "name": "The Tracked Caps Rule", "body": "Uppercase is always tracked (+0.05em minimum, +0.16em for the smallest stencil labels) and always condensed or strip weight. Untracked uppercase does not exist here.", "section": "typography" },
+      { "name": "The Figures Rule", "body": "Any number that can change — amounts, exposure units, timestamps, IDs — is set in mono with tabular figures so it does not shift between reads.", "section": "typography" },
+      { "name": "The Tonal Plane Rule", "body": "New surfaces gain depth by stepping to the next tonal ground (enamel → chassis → board → flap face) and adding a 1px rule. Never by adding a shadow.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep the ground dark; color-scheme: dark is unconditional and there is no light ambient to design for.",
+      "Do mount board content on the board-* ink and rule tokens so it stays legible regardless of surrounding surface.",
+      "Do carry every status three ways — verbatim contract word, authored icon, and state-bar line form.",
+      "Do set every hairline at 1px rule, reserving 2px strokes for the sodium station rule and the status-coloured outcome rule.",
+      "Do keep uppercase tracked and condensed (+0.05em to +0.16em) and set changing numbers in mono with tabular figures.",
+      "Do step tonal planes (enamel → chassis → board → flap face) to build depth.",
+      "Do keep the service route orthogonal: 1px, 45/90 degrees, no curves or elbows.",
+      "Do gate every animation inside prefers-reduced-motion: no-preference and key replayed motion on real state change."
+    ],
+    "donts": [
+      "Don't add drop shadows, glows, or gradients; depth is tonal planes plus hairlines.",
+      "Don't round a corner past 4px, and prefer 0px — the system declares no radius at all today.",
+      "Don't use a pixel, bitmap, or decorative display face; the board speaks in condensed grotesque caps.",
+      "Don't introduce a second accent hue. Sodium amber is the lamp; green, red, hold and idle are state, not decoration.",
+      "Don't use pastel fills or tinted washes behind a status; each signal has its own near-black ground.",
+      "Don't animate anything but the flap throw and the busy spinner, and never replay the flap on a re-render.",
+      "Don't ship an icon from a font or package; icons are authored 16px SVG on a 1.7px stroke and always accompany a label.",
+      "Don't let a second element compete with the board for the first viewport; everything else stays small and even."
+    ]
+  }
+}

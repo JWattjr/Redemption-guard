@@ -8,3 +8,4 @@ __pycache__/
 *.log
 .vercel
 frontend/.next/
+frontend/.impeccable/review/

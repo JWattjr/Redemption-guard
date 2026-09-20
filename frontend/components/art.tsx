@@ -1,207 +1,175 @@
 /**
- * Authored SVG pieces for the "Guardian Command Center" look.
- * All decorative: callers pair every graphic with a text label.
+ * Authored SVG for the concourse status board.
+ * Everything here is decorative: each graphic ships beside a text label.
  */
 import type { Status } from "@/lib/contract";
 
-/** 16×16 pixel map → one <rect> per horizontal run, grouped by colour class. */
-function Pixels({ rows, palette }: { rows: string[]; palette: Record<string, string> }) {
-  const rects: React.ReactNode[] = [];
-  rows.forEach((row, y) => {
-    let x = 0;
-    while (x < row.length) {
-      const ch = row[x];
-      let end = x + 1;
-      while (end < row.length && row[end] === ch) end++;
-      if (palette[ch]) rects.push(<rect key={`${x}-${y}`} x={x} y={y} width={end - x} height={1} className={palette[ch]} />);
-      x = end;
-    }
-  });
-  return <>{rects}</>;
-}
-
-const GUARDIAN = [
-  "....kkkkkkkk....",
-  "..kkbbbbbbbbkk..",
-  ".kbwbbbbbbbbbbk.",
-  ".kbbbbbbbbbbbbk.",
-  ".kbccccccccccbk.",
-  ".kbcckcccckccbk.",
-  ".kbcckcccckccbk.",
-  ".kbcccckkccccbk.",
-  ".kbbccccccccbbk.",
-  "..kbbbbbbbbbbk..",
-  "..kbbbmmmmbbbk..",
-  "...kbbbmmbbbk...",
-  "....kbbbbbbk....",
-  ".....kbbbbk.....",
-  "......kbbk......",
-  ".......kk.......",
-];
-
-export function Guardian({ className = "" }: { className?: string }) {
+/** Service mark: a split-flap tile mid-throw, one leaf amber. */
+export function BoardMark() {
   return (
-    <svg className={`guardian ${className}`} viewBox="0 0 16 16" shapeRendering="crispEdges" aria-hidden focusable="false">
-      <Pixels rows={GUARDIAN} palette={{ k: "px-ink", b: "px-body", w: "px-shine", c: "px-face", m: "px-mint" }} />
-    </svg>
-  );
-}
-
-/** Small abstract emblem per monitored territory. */
-export function AssetEmblem({ assetId }: { assetId: string }) {
-  const cls = `emblem emblem--${assetId.toLowerCase()}`;
-  if (assetId === "NWUSD") {
-    // north star / compass rose
-    return (
-      <svg className={cls} viewBox="0 0 24 24" aria-hidden focusable="false">
-        <rect x="1" y="1" width="22" height="22" rx="5" className="emblem__plate" />
-        <path d="M12 3.5 14 10l6.5 2-6.5 2-2 6.5-2-6.5L3.5 12 10 10Z" className="emblem__mark" />
-        <rect x="11" y="11" width="2" height="2" className="emblem__dot" />
-      </svg>
-    );
-  }
-  if (assetId === "HLUSD") {
-    // halcyon wave over a rising sun
-    return (
-      <svg className={cls} viewBox="0 0 24 24" aria-hidden focusable="false">
-        <rect x="1" y="1" width="22" height="22" rx="5" className="emblem__plate" />
-        <path d="M6 14a6 6 0 0 1 12 0Z" className="emblem__mark" />
-        <path d="M4 17.5c2-1.6 3.4-1.6 5.3 0s3.4 1.6 5.4 0 3.3-1.6 5.3 0" className="emblem__wave" />
-      </svg>
-    );
-  }
-  return (
-    <svg className={cls} viewBox="0 0 24 24" aria-hidden focusable="false">
-      <rect x="1" y="1" width="22" height="22" rx="5" className="emblem__plate" />
-      <path d="M12 5 18 8.5v7L12 19l-6-3.5v-7Z" className="emblem__mark" />
+    <svg className="mark" viewBox="0 0 24 24" aria-hidden focusable="false">
+      <rect x="1.5" y="2.5" width="21" height="19" className="mark__case" />
+      <rect x="4" y="5" width="16" height="6.4" className="mark__leaf" />
+      <rect x="4" y="12.6" width="16" height="6.4" className="mark__leaf mark__leaf--back" />
+      <path d="M2.6 12h18.8" className="mark__split" />
     </svg>
   );
 }
 
 /**
- * The signature gate: two doors in a frame with a beacon.
- * `tone` colours the beacon; `open` slides the doors into the posts.
+ * State bar: the status also reads as line form, so the three statuses
+ * survive greyscale and colour blindness.
+ *   ELIGIBLE  solid · INSUFFICIENT_EVIDENCE  dashed · RESTRICTED  struck
  */
-export function GateArt({ open, tone }: { open: boolean; tone: string }) {
+export function StateBar({ status }: { status: Status | "" }) {
   return (
-    <svg className={`gateart gateart--${open ? "open" : "closed"} gateart--${tone}`} viewBox="0 0 64 44" aria-hidden focusable="false">
-      <rect x="2" y="42" width="60" height="2" className="gateart__ground" />
-      <rect x="8" y="18" width="48" height="24" className="gateart__void" />
-      <path d="M26 34h12M32 28l6 6-6 6" className="gateart__path" />
-      <g className="gateart__door gateart__door--l">
-        <rect x="9" y="18" width="23" height="24" className="gateart__panel" />
-        <path d="M15 19v22M21 19v22M27 19v22" className="gateart__bars" />
-      </g>
-      <g className="gateart__door gateart__door--r">
-        <rect x="32" y="18" width="23" height="24" className="gateart__panel" />
-        <path d="M37 19v22M43 19v22M49 19v22" className="gateart__bars" />
-      </g>
-      <g className="gateart__lock">
-        <rect x="28" y="27" width="8" height="7" rx="1" />
-        <path d="M29.5 27v-2.5a2.5 2.5 0 0 1 5 0V27" />
-      </g>
-      <rect x="2" y="10" width="6" height="32" className="gateart__post" />
-      <rect x="56" y="10" width="6" height="32" className="gateart__post" />
-      <rect x="2" y="10" width="60" height="6" className="gateart__beam" />
-      <rect x="28" y="4" width="8" height="6" className="gateart__beacon" />
+    <svg className={`statebar statebar--${tone(status)}`} viewBox="0 0 48 10" aria-hidden focusable="false" preserveAspectRatio="none">
+      {status === "ELIGIBLE" && <rect x="0" y="3" width="48" height="4" className="statebar__ink" />}
+      {status === "INSUFFICIENT_EVIDENCE" && (
+        <g className="statebar__ink">
+          <rect x="0" y="3" width="9" height="4" />
+          <rect x="13" y="3" width="9" height="4" />
+          <rect x="26" y="3" width="9" height="4" />
+          <rect x="39" y="3" width="9" height="4" />
+        </g>
+      )}
+      {status === "RESTRICTED" && (
+        <g className="statebar__ink">
+          <rect x="0" y="3" width="48" height="4" opacity="0.45" />
+          <rect x="0" y="0" width="3" height="10" />
+          <rect x="9" y="0" width="3" height="10" />
+          <rect x="18" y="0" width="3" height="10" />
+          <rect x="27" y="0" width="3" height="10" />
+          <rect x="36" y="0" width="3" height="10" />
+          <rect x="45" y="0" width="3" height="10" />
+        </g>
+      )}
+      {status === "" && <rect x="0" y="4" width="48" height="2" className="statebar__ink" opacity="0.5" />}
     </svg>
   );
 }
 
-/** Icon that accompanies every status label (never colour alone). */
+function tone(status: Status | "") {
+  if (status === "ELIGIBLE") return "eligible";
+  if (status === "RESTRICTED") return "restricted";
+  if (status === "INSUFFICIENT_EVIDENCE") return "insufficient";
+  return "none";
+}
+
+/** Gate cell: the split-flap that posts the consequence of the status. */
+export function GateFlap({ open }: { open: boolean }) {
+  return (
+    <span className={`flap ${open ? "flap--open" : "flap--closed"}`}>
+      {/* keyed on state: the leaf remounts and the flap replays only when the gate actually changes */}
+      <span key={open ? "open" : "closed"} className="flap__leaf" aria-hidden />
+      <span className="flap__text">{open ? "GATE OPEN" : "GATE CLOSED"}</span>
+    </span>
+  );
+}
+
+/** Status icon — one stroke weight across the set, never colour alone. */
 export function StatusIcon({ status }: { status: Status | "" }) {
   switch (status) {
     case "ELIGIBLE":
       return (
         <svg className="sicon" viewBox="0 0 16 16" aria-hidden focusable="false">
-          <path d="M3 8.5 6.5 12 13 4.5" className="sicon__stroke" />
+          <path d="M2.5 8.5 6.5 12.5 13.5 3.5" className="stroke" />
         </svg>
       );
     case "RESTRICTED":
       return (
         <svg className="sicon" viewBox="0 0 16 16" aria-hidden focusable="false">
-          <rect x="3" y="7" width="10" height="7" rx="1" className="sicon__fill" />
-          <path d="M5 7V5a3 3 0 0 1 6 0v2" className="sicon__stroke" />
+          <circle cx="8" cy="8" r="5.5" className="stroke" />
+          <path d="M4.2 11.8 11.8 4.2" className="stroke" />
         </svg>
       );
     case "INSUFFICIENT_EVIDENCE":
       return (
         <svg className="sicon" viewBox="0 0 16 16" aria-hidden focusable="false">
-          <path d="M5.5 5.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1.9-1.1 1.8" className="sicon__stroke" />
-          <rect x="7" y="11.5" width="2" height="2" className="sicon__fill" />
+          <path d="M8 2.5 14.5 13.5H1.5Z" className="stroke" />
+          <path d="M8 6.5v3.2" className="stroke" />
+          <path d="M8 11.6v.9" className="stroke" />
         </svg>
       );
     default:
       return (
         <svg className="sicon" viewBox="0 0 16 16" aria-hidden focusable="false">
-          <path d="M4 8h8" className="sicon__stroke" />
+          <circle cx="8" cy="8" r="5.5" className="stroke" />
+          <path d="M5 8h6" className="stroke" />
         </svg>
       );
   }
 }
 
-type IconName = "lock" | "open" | "check" | "cross" | "star" | "arrow" | "node" | "chip" | "scroll";
+type IconName = "lock" | "open" | "check" | "cross" | "arrow" | "dot" | "chip" | "plate" | "refresh" | "link";
 
 export function Icon({ name }: { name: IconName }) {
-  const common = { className: "icon", viewBox: "0 0 16 16", "aria-hidden": true, focusable: false } as const;
+  const p = { className: "icon", viewBox: "0 0 16 16", "aria-hidden": true, focusable: false } as const;
   switch (name) {
     case "lock":
       return (
-        <svg {...common}>
-          <rect x="3" y="7" width="10" height="7" rx="1" className="icon__fill" />
-          <path d="M5 7V5a3 3 0 0 1 6 0v2" className="icon__stroke" />
+        <svg {...p}>
+          <rect x="3.5" y="7" width="9" height="6.5" className="stroke" />
+          <path d="M5.5 7V4.8a2.5 2.5 0 0 1 5 0V7" className="stroke" />
         </svg>
       );
     case "open":
       return (
-        <svg {...common}>
-          <rect x="3" y="7" width="10" height="7" rx="1" className="icon__fill" />
-          <path d="M5 7V5a3 3 0 0 1 5.8-1" className="icon__stroke" />
+        <svg {...p}>
+          <rect x="3.5" y="7" width="9" height="6.5" className="stroke" />
+          <path d="M5.5 7V4.8a2.5 2.5 0 0 1 4.8-.9" className="stroke" />
         </svg>
       );
     case "check":
       return (
-        <svg {...common}>
-          <path d="M3 8.5 6.5 12 13 4.5" className="icon__stroke" />
+        <svg {...p}>
+          <path d="M2.5 8.5 6.5 12.5 13.5 3.5" className="stroke" />
         </svg>
       );
     case "cross":
       return (
-        <svg {...common}>
-          <path d="M4 4l8 8M12 4l-8 8" className="icon__stroke" />
-        </svg>
-      );
-    case "star":
-      return (
-        <svg {...common}>
-          <path d="M8 1.5 9.6 6.4 14.5 8l-4.9 1.6L8 14.5 6.4 9.6 1.5 8l4.9-1.6Z" className="icon__fill" />
+        <svg {...p}>
+          <path d="M4 4l8 8M12 4l-8 8" className="stroke" />
         </svg>
       );
     case "arrow":
       return (
-        <svg {...common}>
-          <path d="M2.5 8h10M9 4.5 12.5 8 9 11.5" className="icon__stroke" />
+        <svg {...p}>
+          <path d="M2.5 8h10M9.2 4.4 12.8 8l-3.6 3.6" className="stroke" />
         </svg>
       );
-    case "node":
+    case "dot":
       return (
-        <svg {...common}>
-          <rect x="5" y="5" width="6" height="6" className="icon__fill" />
-          <path d="M1 8h4M11 8h4" className="icon__stroke" />
+        <svg {...p}>
+          <circle cx="8" cy="8" r="3" className="fill" />
         </svg>
       );
     case "chip":
       return (
-        <svg {...common}>
-          <rect x="3.5" y="3.5" width="9" height="9" rx="1" className="icon__stroke" />
-          <path d="M6 1v2.5M10 1v2.5M6 12.5V15M10 12.5V15M1 6h2.5M1 10h2.5M12.5 6H15M12.5 10H15" className="icon__stroke" />
+        <svg {...p}>
+          <rect x="4" y="4" width="8" height="8" className="stroke" />
+          <path d="M6.5 1.5V4M9.5 1.5V4M6.5 12v2.5M9.5 12v2.5M1.5 6.5H4M1.5 9.5H4M12 6.5h2.5M12 9.5h2.5" className="stroke" />
         </svg>
       );
-    case "scroll":
+    case "plate":
       return (
-        <svg {...common}>
-          <rect x="3" y="2" width="10" height="12" rx="1" className="icon__stroke" />
-          <path d="M5.5 5.5h5M5.5 8h5M5.5 10.5h3" className="icon__stroke" />
+        <svg {...p}>
+          <rect x="2.5" y="3" width="11" height="10" className="stroke" />
+          <path d="M5 6h6M5 8.5h6M5 11h3.5" className="stroke" />
+        </svg>
+      );
+    case "refresh":
+      return (
+        <svg {...p}>
+          <path d="M13 8a5 5 0 1 1-1.8-3.85" className="stroke" />
+          <path d="M13.2 1.8v3.1h-3.1" className="stroke" />
+        </svg>
+      );
+    case "link":
+      return (
+        <svg {...p}>
+          <path d="M6.6 9.4a2.8 2.8 0 0 0 4 0l2-2a2.83 2.83 0 0 0-4-4l-1 1" className="stroke" />
+          <path d="M9.4 6.6a2.8 2.8 0 0 0-4 0l-2 2a2.83 2.83 0 0 0 4 4l1-1" className="stroke" />
         </svg>
       );
   }

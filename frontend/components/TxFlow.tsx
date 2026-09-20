@@ -64,10 +64,7 @@ export function TxFlow({
   return (
     <dialog ref={dialogRef} className="txdialog" aria-modal="true" aria-labelledby="txdialog-title">
       <div className="txdialog__head">
-        <div>
-          <div className="eyebrow">Sign on Studio Next</div>
-          <h2 id="txdialog-title">{request.title}</h2>
-        </div>
+        <h2 id="txdialog-title">{request.title}</h2>
         <button type="button" className="btn btn--ghost" onClick={close}>
           Close
         </button>

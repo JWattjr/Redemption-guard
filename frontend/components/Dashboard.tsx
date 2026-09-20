@@ -16,13 +16,12 @@ import { useWallet } from "@/lib/wallet";
 import { installRpcThrottle } from "@/lib/rpcThrottle";
 import proof from "@/lib/proof.generated.json";
 import { TxFlow, type TxRequest } from "./TxFlow";
-import { AssetEmblem, Guardian, Icon, StatusIcon } from "./art";
+import { BoardMark, GateFlap, Icon, StateBar, StatusIcon } from "./art";
 import {
   Activity,
-  AssetCard,
+  AssetRow,
   ContractPanel,
   EvidenceList,
-  GateConsole,
   PolicyPanel,
   ProofPanel,
   ReasonCodes,
@@ -60,8 +59,6 @@ export default function Dashboard() {
   const [request, setRequest] = useState<TxRequest & { assetId: string; amountUnits?: string }>();
   const [outcome, setOutcome] = useState<Outcome>();
   const [faucetMsg, setFaucetMsg] = useState<string>();
-  // Incremented only after contract state confirms a good outcome; replays the guardian flourish once.
-  const [cheer, setCheer] = useState(0);
   const snapshotRef = useRef<{ latestId: number; exposures: number }>({ latestId: 0, exposures: 0 });
 
   const refresh = useCallback(async () => {
@@ -103,6 +100,7 @@ export default function Dashboard() {
 
   const asset = data?.assets.find((a) => a.asset_id === selected);
   const latest = data?.latest[selected] ?? null;
+  const gateOpen = Boolean(asset && (asset.gate_open ?? asset.latest_status === "ELIGIBLE"));
 
   const urlErrors = urls.map(isValidEvidenceUrl);
   const cleanUrls = urls.map((u) => u.trim()).filter(Boolean);
@@ -195,9 +193,6 @@ export default function Dashboard() {
         }
       }
       setOutcome({ ...base, details, confirmation, assessment });
-      if (confirmation === "exposure-recorded" || (confirmation === "assessment-recorded" && assessment?.status === "ELIGIBLE")) {
-        setCheer((c) => c + 1);
-      }
     },
     [request, refresh],
   );
@@ -222,31 +217,21 @@ export default function Dashboard() {
 
   return (
     <div className="shell">
-      <header className="topbar">
-        <div className="brand">
-          <span key={cheer} className={`brand__sprite${cheer ? " brand__sprite--cheer" : ""}`}>
-            <Guardian />
-            {cheer > 0 && (
-              <span className="sparks" aria-hidden>
-                <Icon name="star" />
-                <Icon name="star" />
-                <Icon name="star" />
-              </span>
-            )}
-          </span>
+      <header className="service">
+        <div className="service__id">
+          <BoardMark />
           <div>
-            <div className="brand__name">Redemption Guard</div>
-            <div className="brand__tag">Consensus-gated stablecoin exposure</div>
+            <div className="service__name">Redemption Guard</div>
+            <div className="service__sub">Consensus-gated stablecoin exposure</div>
           </div>
         </div>
-        <div className="topbar__right">
+        <div className="service__state">
           <span className={`netbadge netbadge--${networkBadge.tone}`}>
             <span className="netbadge__dot" aria-hidden />
-            <span className="netbadge__env">Env</span>
             {networkBadge.text}
           </span>
           {!wallet.available ? (
-            <span className="walletnote">No wallet detected</span>
+            <span className="service__note">No wallet detected</span>
           ) : !wallet.address ? (
             <button type="button" className="btn btn--primary" onClick={wallet.connect} disabled={wallet.connecting}>
               {wallet.connecting ? "Connecting…" : "Connect wallet"}
@@ -264,14 +249,11 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <div className="disclosure" role="note">
-        <span className="disclosure__tab" aria-hidden>
-          Field notice
-        </span>
+      <p className="notice" role="note">
         <strong>Authorization prototype — not financial advice.</strong> No tokens move. NWUSD and HLUSD are fictional
         assets; the built-in evidence pages are labeled synthetic reviewer fixtures. Studio Next is a release-candidate
         network and may reset.
-      </div>
+      </p>
 
       {wallet.error && (
         <div className="alert alert--warn" role="alert">
@@ -287,28 +269,25 @@ export default function Dashboard() {
 
       <main className="grid">
         <div className="col col--main">
-          <section aria-labelledby="assets-title">
-            <div className="section-head">
-              <h1 id="assets-title" className="section-title">
-                <span className="section-title__kicker" aria-hidden>
-                  Territories
-                </span>
-                Monitored assets
-              </h1>
-              <div className="section-head__meta">
-                {data && <span className="muted small">Read {new Date(data.fetchedAt).toLocaleTimeString()}</span>}
+          <section className="board" aria-labelledby="assets-title">
+            <div className="board__head">
+              <h1 id="assets-title">Monitored assets</h1>
+              <span className="stencil">Service board</span>
+              <div className="board__meta">
+                {data && <span className="board__read mono">Posted {utcTime(new Date(data.fetchedAt).toISOString())}</span>}
                 <button
                   type="button"
-                  className={`btn btn--ghost btn--refresh${refreshing ? " is-busy" : ""}`}
+                  className={`btn btn--quiet${refreshing ? " is-busy" : ""}`}
                   onClick={refresh}
                   disabled={refreshing}
                   aria-busy={refreshing}
                 >
-                  <Icon name="star" />
+                  <Icon name="refresh" />
                   {refreshing ? "Refreshing…" : "Refresh"}
                 </button>
               </div>
             </div>
+
             {loadError &&
               (/rate limit|429/i.test(loadError) ? (
                 <div className="alert alert--warn" role="status">
@@ -320,11 +299,19 @@ export default function Dashboard() {
                   <code>npm run deploy:demo</code>.
                 </div>
               ))}
-            <div className="assets">
+
+            <div className="board__cols" aria-hidden>
+              <span>Asset</span>
+              <span>Posted status</span>
+              <span>Exposure gate</span>
+              <span>Record</span>
+            </div>
+
+            <div className="board__rows">
               {!data && !loadError
-                ? [0, 1].map((i) => <div key={i} className="asset asset--skeleton" aria-busy="true" />)
+                ? [0, 1].map((i) => <div key={i} className="row row--waiting" aria-busy="true" />)
                 : data?.assets.map((a) => (
-                    <AssetCard
+                    <AssetRow
                       key={a.asset_id}
                       asset={a}
                       latest={data.latest[a.asset_id]}
@@ -333,22 +320,20 @@ export default function Dashboard() {
                     />
                   ))}
               {data && data.assets.length === 0 && (
-                <p className="muted">No assets registered. Run the deployment script to register the demo pair.</p>
+                <p className="quiet">No assets registered. Run the deployment script to register the demo pair.</p>
               )}
             </div>
           </section>
 
-          <div className="mission">
-            <span className="mission__route" aria-hidden>
-              <Icon name="arrow" />
-            </span>
-            <section className="panel panel--action panel--assess" aria-labelledby="assess-title">
+          <div className="stations">
+            <section className="panel panel--station" aria-labelledby="assess-title">
               <div className="panel__head">
                 <h2 id="assess-title" className="step">
                   <span className="step__num">1</span>
                   <span className="step__sep">{" · "}</span>
                   Submit evidence
                 </h2>
+                <span className="stencil">Station 01</span>
                 <AssetPicker
                   value={selected}
                   onChange={setSelected}
@@ -356,12 +341,12 @@ export default function Dashboard() {
                   label="Assessment asset"
                 />
               </div>
-              <p className="panel__lede">
+              <p className="lede">
                 Validators fetch these URLs themselves, judge them against the frozen policy, and must agree on the
                 status before it is written.
               </p>
               <div className="fixtures">
-                <span className="fixtures__label">Synthetic fixtures:</span>
+                <span className="fixtures__label">Synthetic fixtures</span>
                 {FIXTURES.map((f) => (
                   <button
                     key={f.key}
@@ -374,7 +359,7 @@ export default function Dashboard() {
                     }}
                   >
                     <span className="chip__led" aria-hidden />
-                    {f.label} <span className="chip__asset">· {f.assetId}</span>
+                    {f.label} <span className="chip__asset mono">{f.assetId}</span>
                   </button>
                 ))}
               </div>
@@ -397,7 +382,7 @@ export default function Dashboard() {
                     {urls.length > 1 && (
                       <button
                         type="button"
-                        className="btn btn--ghost btn--icon"
+                        className="btn btn--quiet btn--icon"
                         aria-label={`Remove URL ${i + 1}`}
                         onClick={() => setUrls(urls.filter((_, j) => j !== i))}
                       >
@@ -411,11 +396,11 @@ export default function Dashboard() {
               <div className="panel__foot">
                 <button
                   type="button"
-                  className="btn btn--ghost"
+                  className="btn btn--quiet"
                   disabled={urls.length >= 3}
                   onClick={() => setUrls([...urls, ""])}
                 >
-                  + Add URL ({urls.length}/3)
+                  Add URL ({urls.length}/3)
                 </button>
                 <button
                   type="button"
@@ -435,13 +420,14 @@ export default function Dashboard() {
               )}
             </section>
 
-            <section className="panel panel--action panel--exposure" aria-labelledby="exposure-title">
+            <section className="panel panel--station" aria-labelledby="exposure-title">
               <div className="panel__head">
                 <h2 id="exposure-title" className="step">
                   <span className="step__num">2</span>
                   <span className="step__sep">{" · "}</span>
                   Request exposure
                 </h2>
+                <span className="stencil">Station 02</span>
                 <AssetPicker
                   value={selected}
                   onChange={setSelected}
@@ -449,30 +435,23 @@ export default function Dashboard() {
                   label="Exposure asset"
                 />
               </div>
-              <p className="panel__lede">
+              <p className="lede">
                 Deterministic contract code checks the latest agreed status. Only <strong>ELIGIBLE</strong> records the
                 request; anything else reverts.
               </p>
-              <div className="gatepreview">
-                <div className="gatepreview__head">
-                  <span className="gatepreview__label">
-                    <AssetEmblem assetId={selected} />
-                    Current gate for {selected}
-                  </span>
+              <div className="gatecheck">
+                <div className="gatecheck__head">
+                  <span className="gatecheck__label mono">{selected}</span>
                   <StatusBadge status={asset?.latest_status ?? ""} />
                 </div>
-                <GateConsole
-                  compact
-                  open={Boolean(asset && (asset.gate_open ?? asset.latest_status === "ELIGIBLE"))}
-                  tone={STATUS_META[asset?.latest_status ?? ""].tone}
-                  note={
-                    asset?.latest_status === "ELIGIBLE" && asset.gate_open === false && asset.gate_open_at
-                      ? "This ELIGIBLE assessment is cooling down. Gate re-opens at " + utcTime(asset.gate_open_at) + "."
-                      : asset?.latest_status === "ELIGIBLE"
-                        ? `Contract should record this request (assessment #${latest?.id}).`
-                        : "Contract should reject this request. Send it anyway to see the on-chain rejection."
-                  }
-                />
+                <GateFlap open={gateOpen} />
+                <p className="gatecheck__note">
+                  {asset?.latest_status === "ELIGIBLE" && asset.gate_open === false && asset.gate_open_at
+                    ? "This ELIGIBLE assessment is cooling down. Gate re-opens at " + utcTime(asset.gate_open_at) + "."
+                    : asset?.latest_status === "ELIGIBLE"
+                      ? `Contract should record this request (assessment #${latest?.id}).`
+                      : "Contract should reject this request. Send it anyway to see the on-chain rejection."}
+                </p>
               </div>
               <label className="field">
                 <span className="field__label">Amount (whole units)</span>
@@ -485,7 +464,7 @@ export default function Dashboard() {
                 />
               </label>
               <div className="panel__foot">
-                <span className="footnote footnote--inline">Authorization record only. No tokens move.</span>
+                <span className="note note--inline">Authorization record only. No tokens move.</span>
                 <button
                   type="button"
                   className="btn btn--primary"
@@ -511,12 +490,11 @@ export default function Dashboard() {
 
           {wallet.address && wallet.onStudioNext && (
             <div className="faucet">
-              <button type="button" className="btn btn--ghost" onClick={requestFunds}>
-                <Icon name="star" />
+              <button type="button" className="btn btn--quiet" onClick={requestFunds}>
                 Get Studio Next test GEN for fees
               </button>
               {faucetMsg && (
-                <span className="small muted" role="status">
+                <span className="quiet" role="status">
                   {faucetMsg}
                 </span>
               )}
@@ -541,9 +519,7 @@ export default function Dashboard() {
         <span>Authorization prototype. Not financial advice. No custody, swaps, or price feeds.</span>
       </footer>
 
-      {request && wallet.kit && (
-        <TxFlow kit={wallet.kit} request={request} onClose={closeFlow} onDone={onDone} />
-      )}
+      {request && wallet.kit && <TxFlow kit={wallet.kit} request={request} onClose={closeFlow} onDone={onDone} />}
     </div>
   );
 }
@@ -568,7 +544,7 @@ function AssetPicker({
   };
   return (
     <div
-      className="segmented"
+      className="picker"
       role="radiogroup"
       aria-label={label}
       onKeyDown={(event) => {
@@ -598,10 +574,9 @@ function AssetPicker({
           ref={(element) => {
             buttons.current[id] = element;
           }}
-          className={`segmented__item ${value === id ? "is-active" : ""}`}
+          className={`picker__item ${value === id ? "is-active" : ""}`}
           onClick={() => onChange(id)}
         >
-          <AssetEmblem assetId={id} />
           {id}
         </button>
       ))}
@@ -645,25 +620,22 @@ function OutcomeCard({ outcome }: { outcome: Outcome }) {
 
   return (
     <section className={`panel outcome outcome--${tone}`} aria-live="polite" aria-labelledby="outcome-title">
-      <div className="outcome__eyebrow">Mission receipt</div>
       <div className="panel__head">
         <h2 id="outcome-title" className="outcome__title">
-          <span className="outcome__icon" aria-hidden>
-            {outcome.confirmation === "pending" ? (
-              <Icon name="node" />
-            ) : outcome.assessment ? (
+          <span className="outcome__glyph" aria-hidden>
+            {outcome.assessment ? (
               <StatusIcon status={outcome.assessment.status} />
             ) : outcome.confirmation === "exposure-recorded" ? (
-              <Icon name="check" />
+              <Icon name="open" />
             ) : tone === "restricted" ? (
               <Icon name="lock" />
             ) : (
-              <Icon name="node" />
+              <Icon name="dot" />
             )}
           </span>
           {headline}
         </h2>
-        {outcome.assessment && <StatusBadge status={outcome.assessment.status} size="lg" />}
+        {outcome.assessment && <StateBar status={outcome.assessment.status} />}
       </div>
 
       {outcome.assessment && (
@@ -693,7 +665,7 @@ function OutcomeCard({ outcome }: { outcome: Outcome }) {
         <p className="outcome__reasoning">Contract error: {details.errorText}</p>
       )}
 
-      <dl className="facts facts--grid">
+      <dl className="specs specs--wide">
         <div>
           <dt>Transaction</dt>
           <dd className="mono break">
@@ -710,20 +682,16 @@ function OutcomeCard({ outcome }: { outcome: Outcome }) {
           <dt>Lifecycle</dt>
           <dd>
             {statusName}
-            {!finalized && <span className="tag tag--warn tag--inline">not final</span>}
+            {!finalized && <span className="mark-tag is-warn">not final</span>}
           </dd>
         </div>
         <div>
           <dt>Execution result</dt>
-          <dd className={executed ? "" : "text-restricted"}>{execution}</dd>
+          <dd className={executed ? "" : "is-bad"}>{execution}</dd>
         </div>
         <div>
           <dt>Validators</dt>
-          <dd>
-            {details?.validators
-              ? `${details.agreeVotes ?? "?"} agree of ${details.validators}`
-              : "—"}
-          </dd>
+          <dd>{details?.validators ? `${details.agreeVotes ?? "?"} agree of ${details.validators}` : "—"}</dd>
         </div>
         <div>
           <dt>State check</dt>
@@ -755,7 +723,7 @@ function OutcomeCard({ outcome }: { outcome: Outcome }) {
         )}
       </dl>
       {!finalized && outcome.confirmation !== "pending" && (
-        <p className="footnote">
+        <p className="note">
           Shown at the decided stage for responsiveness. The lifecycle becomes FINALIZED after the appeal window.
         </p>
       )}

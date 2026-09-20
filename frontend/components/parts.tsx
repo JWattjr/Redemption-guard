@@ -3,7 +3,7 @@
 import type { Assessment, Asset, Exposure, Policy, Status } from "@/lib/contract";
 import { STATUS_META } from "@/lib/contract";
 import { explorerAddress, explorerTx as explorerTxUrl } from "@/lib/config";
-import { AssetEmblem, GateArt, Icon, StatusIcon } from "./art";
+import { GateFlap, Icon, StateBar, StatusIcon } from "./art";
 
 export function short(value: string, head = 6, tail = 4) {
   return value.length > head + tail + 1 ? `${value.slice(0, head)}…${value.slice(-tail)}` : value;
@@ -14,7 +14,7 @@ export function when(iso?: string) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
   // Fixed locale and UTC so prerendered HTML and the browser render identical text.
-  return `${d.toLocaleString("en-GB", { timeZone: "UTC", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false })} UTC`;
+  return `${d.toLocaleString("en-GB", { timeZone: "UTC", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hour12: false })} UTC`;
 }
 
 export function utcTime(iso?: string | null) {
@@ -31,7 +31,7 @@ export function groupUnits(units: string) {
 export function StatusBadge({ status, size = "md" }: { status: Status | ""; size?: "md" | "lg" }) {
   const meta = STATUS_META[status];
   return (
-    <span className={`badge badge--${meta.tone} badge--${size}`}>
+    <span className={`posted posted--${meta.tone} posted--${size}`}>
       <StatusIcon status={status} />
       {meta.label}
     </span>
@@ -40,10 +40,9 @@ export function StatusBadge({ status, size = "md" }: { status: Status | ""; size
 
 export function ReasonCodes({ codes }: { codes: string[] }) {
   return (
-    <ul className="carts" aria-label="Reason codes">
+    <ul className="codes" aria-label="Reason codes">
       {codes.map((c) => (
-        <li key={c} className="cart">
-          <span className="cart__notch" aria-hidden />
+        <li key={c} className="codes__item">
           {c}
         </li>
       ))}
@@ -53,26 +52,26 @@ export function ReasonCodes({ codes }: { codes: string[] }) {
 
 export function EvidenceList({ assessment }: { assessment: Assessment }) {
   return (
-    <ul className="evidence">
+    <ul className="sources">
       {assessment.sources.map((s) => {
         const supports = assessment.supporting_urls.includes(s.url);
         return (
           <li key={s.url}>
-            <a href={s.url} target="_blank" rel="noreferrer noopener" className="evidence__url">
+            <a href={s.url} target="_blank" rel="noreferrer noopener" className="sources__url mono">
               {s.url.replace(/^https:\/\//, "")}
             </a>
-            <span className="evidence__tags">
-              <span className={`tag ${s.authoritative ? "tag--ok" : "tag--muted"}`}>
+            <span className="sources__marks">
+              <span className={`mark-tag ${s.authoritative ? "is-ok" : "is-off"}`}>
                 <Icon name={s.authoritative ? "check" : "cross"} />
                 {s.authoritative ? "Registered issuer domain" : "Not an issuer domain"}
               </span>
-              <span className={`tag ${s.fetch === "OK" ? "tag--muted" : "tag--warn"}`}>
-                <Icon name="node" />
+              <span className={`mark-tag ${s.fetch === "OK" ? "" : "is-warn"}`}>
+                <Icon name="dot" />
                 {s.fetch === "OK" ? "Fetched by validators" : `Fetch: ${s.fetch}`}
               </span>
               {supports && (
-                <span className="tag tag--ink">
-                  <Icon name="star" />
+                <span className="mark-tag is-cited">
+                  <Icon name="arrow" />
                   Cited as support
                 </span>
               )}
@@ -84,34 +83,8 @@ export function EvidenceList({ assessment }: { assessment: Assessment }) {
   );
 }
 
-/** The gate console: the signature status motif (graphic + icon + text). */
-export function GateConsole({
-  open,
-  tone,
-  note,
-  compact = false,
-}: {
-  open: boolean;
-  tone: string;
-  note: string;
-  compact?: boolean;
-}) {
-  return (
-    <div className={`console console--${open ? "open" : "closed"} console--${open ? "eligible" : tone}${compact ? " console--compact" : ""}`}>
-      <GateArt open={open} tone={open ? "eligible" : tone} />
-      <div className="console__text">
-        <span className="console__label">Exposure gate</span>
-        <span className="console__value">
-          <Icon name={open ? "open" : "lock"} />
-          {open ? "Open" : "Closed"}
-        </span>
-        <span className="console__note">{note}</span>
-      </div>
-    </div>
-  );
-}
-
-export function AssetCard({
+/** One asset posted on the board: ticker, status, gate, times, notes. */
+export function AssetRow({
   asset,
   latest,
   selected,
@@ -126,95 +99,76 @@ export function AssetCard({
   const open = asset.gate_open ?? asset.latest_status === "ELIGIBLE";
   const cooling = asset.latest_status === "ELIGIBLE" && !open && asset.gate_open_at;
   return (
-    <article
-      className={`asset asset--${meta.tone} asset--${asset.asset_id.toLowerCase()}${selected ? " asset--selected" : ""}`}
-      aria-label={`${asset.asset_id}${selected ? ", selected" : ""}`}
-    >
-      {selected && (
-        <span className="asset__flag">
-          <Icon name="star" />
-          Selected
-        </span>
-      )}
-      <header className="asset__head">
-        <AssetEmblem assetId={asset.asset_id} />
-        <div className="asset__id">
+    <article className={`row row--${meta.tone}${selected ? " row--selected" : ""}`} aria-label={asset.asset_id}>
+      <div className="row__asset">
+        <span className="row__lamp" aria-hidden />
+        <div>
           <div className="asset__ticker">{asset.asset_id}</div>
-          <div className="asset__name">{asset.name}</div>
-          <div className="asset__issuer">{asset.issuer}</div>
+          <div className="row__name">{asset.name}</div>
+          <div className="row__issuer">{asset.issuer}</div>
         </div>
+      </div>
+
+      <div className="row__status">
         <StatusBadge status={asset.latest_status} size="lg" />
-      </header>
+        <StateBar status={asset.latest_status} />
+      </div>
 
-      <GateConsole
-        open={open}
-        tone={meta.tone}
-        note={cooling ? `Gate re-opens at ${utcTime(asset.gate_open_at)}` : meta.gate}
-      />
+      <div className="row__gate">
+        <GateFlap open={open} />
+        <span className="row__gatenote">{cooling ? `Re-opens ${utcTime(asset.gate_open_at)}` : meta.gate}</span>
+      </div>
 
-      {latest ? (
-        <div className="asset__body">
-          <p className="asset__reasoning">{latest.reasoning}</p>
-          <ReasonCodes codes={latest.reason_codes} />
-          <dl className="facts">
-            <div>
-              <dt>Assessment</dt>
-              <dd>#{latest.id}</dd>
-            </div>
-            <div>
-              <dt>Assessed</dt>
-              <dd>{when(latest.assessed_at)}</dd>
-            </div>
-            <div>
-              <dt>Approved exposure</dt>
-              <dd className="mono">{groupUnits(asset.approved_exposure_units)} units</dd>
-            </div>
-          </dl>
+      <dl className="row__data">
+        <div>
+          <dt>Assessment</dt>
+          <dd>{latest ? `#${latest.id}` : "—"}</dd>
         </div>
-      ) : (
-        <div className="asset__body asset__body--empty">
+        <div>
+          <dt>Assessed</dt>
+          <dd>{latest ? when(latest.assessed_at) : "—"}</dd>
+        </div>
+        <div>
+          <dt>Approved exposure</dt>
+          <dd className="mono">{groupUnits(asset.approved_exposure_units)} units</dd>
+        </div>
+      </dl>
+
+      <div className="row__notes">
+        {latest ? (
+          <>
+            <p>{latest.reasoning}</p>
+            <ReasonCodes codes={latest.reason_codes} />
+          </>
+        ) : (
           <p>No assessment on-chain yet. Until validators agree on one, the gate stays closed.</p>
+        )}
+        <div className="row__foot">
+          <span className="row__domain">
+            Issuer domain <span className="mono">{asset.authoritative_domains.join(", ")}</span>
+          </span>
+          <button type="button" className={`btn ${selected ? "btn--on" : "btn--quiet"}`} onClick={onSelect} aria-pressed={selected}>
+            {selected && <Icon name="check" />}
+            {selected ? "Selected" : "Select asset"}
+          </button>
         </div>
-      )}
-
-      <footer className="asset__foot">
-        <span className="asset__domain">
-          <span className="muted">Issuer domain</span>{" "}
-          <span className="mono break">{asset.authoritative_domains.join(", ")}</span>
-        </span>
-        <button
-          type="button"
-          className={`btn ${selected ? "btn--selected" : "btn--ghost"}`}
-          onClick={onSelect}
-          aria-pressed={selected}
-        >
-          {selected && <Icon name="check" />}
-          {selected ? "Selected" : "Select asset"}
-        </button>
-      </footer>
+      </div>
     </article>
   );
 }
 
 export function PolicyPanel({ policy }: { policy?: Policy }) {
   return (
-    <section className="panel panel--rulebook" aria-labelledby="policy-title">
-      <div className="panel__head">
-        <h2 id="policy-title" className="rail-title">
-          <Icon name="scroll" />
-          Frozen policy
-        </h2>
-        <span className="lockchip">
-          <Icon name="lock" />
-          Frozen
-        </span>
+    <section className="plate" aria-labelledby="policy-title">
+      <div className="plate__head">
+        <h2 id="policy-title">Frozen policy</h2>
+        <span className="stencil">{policy ? policy.policy_id : "RG-TREASURY-REDEMPTION-v1"}</span>
       </div>
-      {policy && <p className="policy__id mono">{policy.policy_id}</p>}
       <blockquote className="policy">
         {policy?.text ??
           "New exposure is eligible only when authoritative evidence clearly refers to the correct asset and indicates that ordinary redemptions remain operational. Return RESTRICTED when authoritative evidence reports an active suspension, material delay, broad restriction, or equivalent redemption impairment. Return INSUFFICIENT_EVIDENCE when sources are missing, ambiguous, stale, contradictory, non-authoritative, or cannot be tied confidently to the asset."}
       </blockquote>
-      <ul className="policy__rules">
+      <ul className="rules">
         <li>Stored in the contract as a constant. Nobody, including the owner, can edit it.</li>
         <li>Only sources on the asset&apos;s registered issuer domain count as authoritative.</li>
         <li>
@@ -235,14 +189,12 @@ export function PolicyPanel({ policy }: { policy?: Policy }) {
 
 export function ContractPanel({ address, owner }: { address: string; owner?: string }) {
   return (
-    <section className="panel panel--idcard" aria-labelledby="contract-title">
-      <div className="panel__head">
-        <h2 id="contract-title" className="rail-title">
-          <Icon name="chip" />
-          Contract
-        </h2>
+    <section className="plate" aria-labelledby="contract-title">
+      <div className="plate__head">
+        <h2 id="contract-title">Contract</h2>
+        <span className="stencil">CHAIN 61997</span>
       </div>
-      <dl className="facts facts--stack">
+      <dl className="specs">
         <div>
           <dt>Address</dt>
           <dd className="mono break">
@@ -259,7 +211,7 @@ export function ContractPanel({ address, owner }: { address: string; owner?: str
         )}
         <div>
           <dt>Network</dt>
-          <dd>GenLayer Studio Next · chain 61997</dd>
+          <dd>GenLayer Studio Next</dd>
         </div>
         <div>
           <dt>Runner</dt>
@@ -281,42 +233,41 @@ export function Activity({ assessments, exposures }: { assessments: Assessment[]
   ].sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : b.kind.localeCompare(a.kind)));
 
   return (
-    <section className="panel" aria-labelledby="activity-title">
-      <div className="panel__head">
-        <h2 id="activity-title" className="rail-title">
-          <Icon name="node" />
-          On-chain activity
-        </h2>
-        <span className="muted small">{items.length ? `${items.length} records` : ""}</span>
+    <section className="plate" aria-labelledby="activity-title">
+      <div className="plate__head">
+        <h2 id="activity-title">On-chain activity</h2>
+        <span className="stencil">{items.length ? `${items.length} records` : "log"}</span>
       </div>
       {items.length === 0 ? (
-        <p className="empty">No assessments or exposure requests recorded yet.</p>
+        <p className="quiet">No assessments or exposure requests recorded yet.</p>
       ) : (
-        <ol className="activity">
+        <ol className="log">
           {items.slice(0, 12).map((row) =>
             row.kind === "assessment" ? (
-              <li key={`a${row.item.id}`} className="activity__row activity__row--assessment">
-                <span className="activity__kind">Assessment #{row.item.id}</span>
-                <span className="activity__what">
-                  <strong>{row.item.asset_id}</strong> <StatusBadge status={row.item.status} />
+              <li key={`a${row.item.id}`} className="log__row">
+                <span className="log__time mono">{when(row.at)}</span>
+                <span className="log__what">
+                  <span className="log__kind">Assessment #{row.item.id}</span>
+                  <strong className="mono">{row.item.asset_id}</strong>
+                  <StatusBadge status={row.item.status} />
+                  <StateBar status={row.item.status} />
                 </span>
-                <span className="activity__when">{when(row.at)}</span>
               </li>
             ) : (
-              <li key={`e${row.item.id}`} className="activity__row activity__row--exposure">
-                <span className="activity__kind">Exposure #{row.item.id}</span>
-                <span className="activity__what">
-                  <strong>{row.item.asset_id}</strong>{" "}
-                  <span className="mono">{groupUnits(row.item.amount_units)} units</span>{" "}
-                  <span className="muted">under assessment #{row.item.assessment_id}</span>
+              <li key={`e${row.item.id}`} className="log__row">
+                <span className="log__time mono">{when(row.at)}</span>
+                <span className="log__what">
+                  <span className="log__kind">Exposure #{row.item.id}</span>
+                  <strong className="mono">{row.item.asset_id}</strong>
+                  <span className="mono">{groupUnits(row.item.amount_units)} units</span>
+                  <span className="quiet">under assessment #{row.item.assessment_id}</span>
                 </span>
-                <span className="activity__when">{when(row.at)}</span>
               </li>
             ),
           )}
         </ol>
       )}
-      <p className="footnote">
+      <p className="note">
         Blocked exposure requests revert, so they leave no record in contract state; they remain visible as failed
         transactions on the explorer.
       </p>
@@ -334,61 +285,58 @@ type ProofFlow = {
   exposure: { hash: string; statusName: string; executionResultName: string; errorText?: string };
 };
 
-export function ProofPanel({ proof, contractAddress }: { proof: { contractAddress: string; generatedAt: string; flows: ProofFlow[] }; contractAddress: string }) {
+export function ProofPanel({
+  proof,
+  contractAddress,
+}: {
+  proof: { contractAddress: string; generatedAt: string; flows: ProofFlow[] };
+  contractAddress: string;
+}) {
   if (proof.contractAddress.toLowerCase() !== contractAddress.toLowerCase() || proof.flows.length === 0) return null;
   return (
-    <section className="panel panel--receipts" aria-labelledby="proof-title">
+    <section className="panel panel--proof" aria-labelledby="proof-title">
       <div className="panel__head">
-        <h2 id="proof-title" className="section-title">Proof transactions</h2>
-        <span className="muted small">Seeded {when(proof.generatedAt)} · re-read from chain</span>
+        <h2 id="proof-title">Proof transactions</h2>
+        <span className="stencil">Seeded {when(proof.generatedAt)} · re-read from chain</span>
       </div>
-      <p className="panel__lede">
-        The three reference flows, recorded by <code>npm run deploy:demo</code> against this contract. Blocked requests appear
-        here because a reverted transaction leaves no contract state.
+      <p className="lede">
+        The three reference flows, recorded by <code>npm run deploy:demo</code> against this contract. Blocked requests
+        appear here because a reverted transaction leaves no contract state.
       </p>
-      <ol className="receipts">
-        {proof.flows.map((f, i) => {
+      <ol className="proofs">
+        {proof.flows.map((f) => {
           const agree = f.assess.votes ? Object.values(f.assess.votes).filter((v) => v === "agree").length : undefined;
           return (
-            <li key={f.assess.hash} className={`receipt ${f.exposureAllowed ? "receipt--ok" : "receipt--blocked"}`}>
-              <div className="receipt__head">
-                <span className="receipt__no" aria-hidden>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <strong className="receipt__ticker">{f.assetId}</strong>
+            <li key={f.assess.hash} className="proofs__row">
+              <div className="proofs__asset">
+                <strong className="mono">{f.assetId}</strong>
                 <StatusBadge status={f.status as Status} />
-                <span className={`tag ${f.exposureAllowed ? "tag--ok" : "tag--bad"}`}>
-                  <Icon name={f.exposureAllowed ? "check" : "lock"} />
-                  Exposure {f.exposureAllowed ? "recorded" : "blocked"}
+                <StateBar status={f.status as Status} />
+              </div>
+              <div className="proofs__leg">
+                <span className="proofs__label">Assessment #{f.assessmentId}</span>
+                <a className="mono hash" href={explorerTxUrl(f.assess.hash)} target="_blank" rel="noreferrer noopener">
+                  {short(f.assess.hash, 10, 6)}
+                </a>
+                <span className="proofs__meta">
+                  {f.assess.executionResultName}
+                  {f.assess.validators ? ` · ${agree ?? "?"}/${f.assess.validators} agree` : ""}
                 </span>
               </div>
-              <dl className="receipt__txs">
-                <div className="receipt__leg">
-                  <dt>Assessment #{f.assessmentId}</dt>
-                  <dd>
-                    <a className="mono hash" href={explorerTxUrl(f.assess.hash)} target="_blank" rel="noreferrer noopener">
-                      {short(f.assess.hash, 10, 6)}
-                    </a>
-                    <span className="receipt__meta">
-                      {f.assess.executionResultName}
-                      {f.assess.validators ? ` · ${agree ?? "?"}/${f.assess.validators} agree` : ""}
-                    </span>
-                  </dd>
-                </div>
-                <span className="receipt__route" aria-hidden>
-                  <Icon name="arrow" />
+              <div className="proofs__leg">
+                <span className="proofs__label">Exposure request</span>
+                <a className="mono hash" href={explorerTxUrl(f.exposure.hash)} target="_blank" rel="noreferrer noopener">
+                  {short(f.exposure.hash, 10, 6)}
+                </a>
+                <span className="proofs__meta">
+                  <span className={f.exposureAllowed ? "is-recorded" : "is-blocked"}>
+                    <Icon name={f.exposureAllowed ? "open" : "lock"} />
+                    {f.exposureAllowed ? "Recorded" : "Blocked"}
+                  </span>{" "}
+                  {f.exposure.executionResultName}
                 </span>
-                <div className="receipt__leg">
-                  <dt>Exposure request</dt>
-                  <dd>
-                    <a className="mono hash" href={explorerTxUrl(f.exposure.hash)} target="_blank" rel="noreferrer noopener">
-                      {short(f.exposure.hash, 10, 6)}
-                    </a>
-                    <span className="receipt__meta">{f.exposure.executionResultName}</span>
-                    {f.exposure.errorText && <code className="receipt__error">{f.exposure.errorText}</code>}
-                  </dd>
-                </div>
-              </dl>
+                {f.exposure.errorText && <code className="revert">{f.exposure.errorText}</code>}
+              </div>
             </li>
           );
         })}

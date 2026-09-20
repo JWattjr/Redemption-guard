@@ -150,10 +150,12 @@ export async function fetchTxDetails(hash: string): Promise<TxDetails> {
 }
 
 export const STATUS_META: Record<Status | "", { label: string; tone: string; gate: string }> = {
-  ELIGIBLE: { label: "Eligible", tone: "eligible", gate: "New exposure permitted" },
-  RESTRICTED: { label: "Restricted", tone: "restricted", gate: "New exposure blocked" },
-  INSUFFICIENT_EVIDENCE: { label: "Insufficient evidence", tone: "insufficient", gate: "New exposure blocked" },
-  "": { label: "Not assessed", tone: "none", gate: "New exposure blocked" },
+  // The contract's own tokens, printed verbatim so the board and the frozen
+  // policy on the same screen never disagree.
+  ELIGIBLE: { label: "ELIGIBLE", tone: "eligible", gate: "New exposure permitted" },
+  RESTRICTED: { label: "RESTRICTED", tone: "restricted", gate: "New exposure blocked" },
+  INSUFFICIENT_EVIDENCE: { label: "INSUFFICIENT_EVIDENCE", tone: "insufficient", gate: "New exposure blocked" },
+  "": { label: "NOT ASSESSED", tone: "none", gate: "New exposure blocked" },
 };
 
 export function isValidEvidenceUrl(value: string): string | null {
