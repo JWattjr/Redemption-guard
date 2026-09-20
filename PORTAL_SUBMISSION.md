@@ -80,6 +80,14 @@ Additional genuine transactions against the same deployment:
 
 An earlier deployment (`0xc013C164…2070`) ran the same three flows with the same outcomes before the aggregated `get_dashboard` view was added.
 
+## What a reviewer sees
+
+![Desktop status board: a steel-framed service board on an enamel midnight ground, one row per asset. NWUSD reads ELIGIBLE with the exposure gate open; HLUSD reads INSUFFICIENT_EVIDENCE with the gate closed. The frozen policy sits on the right rail.](docs/screenshots/desktop.png)
+
+The same board at 390px, with the rows stacked and the gate cell kept beside the status it follows:
+
+<img src="docs/screenshots/mobile.png" alt="Mobile status board: the NWUSD row stacked, showing ticker, posted status ELIGIBLE, the GATE OPEN cell, and the assessment record." width="320">
+
 ## 60-second reviewer demo
 
 1. **0–10 s.** Open https://redemption-guard.vercel.app. Without connecting, you see live chain state: NWUSD `ELIGIBLE` with the gate **Open**, HLUSD `INSUFFICIENT_EVIDENCE` with the gate **Closed**, the frozen policy, and the on-chain activity.

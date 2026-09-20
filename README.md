@@ -8,6 +8,8 @@
 
 > Authorization prototype. Not financial advice. No tokens, custody, swaps, price feeds, database, accounts, or backend. NWUSD and HLUSD are fictional assets, and the three evidence pages are labeled synthetic reviewer fixtures.
 
+![The Redemption Guard status board at 1440px: NWUSD posted ELIGIBLE with the exposure gate open, HLUSD posted INSUFFICIENT_EVIDENCE with the gate closed.](docs/screenshots/desktop.png)
+
 ## What it does
 
 Every assessment returns exactly one status under this frozen policy (stored as a contract constant):
@@ -34,7 +36,7 @@ scripts/verify-proof.ts           re-read proof transactions (lifecycle, votes, 
 frontend/                         Next.js 16 dashboard (TypeScript)
 frontend/public/evidence/         the three synthetic evidence fixtures
 deployments/                      studio-next.json, demo-proof.json (generated, committed)
-docs/screenshots/                 desktop, mobile, and E2E screenshots
+docs/screenshots/                 desktop, tablet, mobile, and E2E screenshots
 ```
 
 ## Pinned toolchain (one release-candidate family)
