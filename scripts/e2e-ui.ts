@@ -144,14 +144,14 @@ async function main() {
   await assessPanel.getByRole("button", { name: /Operational/ }).click();
   await assessPanel.getByRole("button", { name: "Run consensus assessment" }).click();
   await approveInPanel(page, "ui-assessment");
-  await waitOutcome(page, /Validators agreed|No assessment was recorded/, "ui-assessment", 15 * 60_000);
+  await waitOutcome(page, /Validators agreed|No assessment was recorded|Could not confirm/, "ui-assessment", 15 * 60_000);
 
   // 3. Permitted exposure on NWUSD.
   await exposurePanel.getByRole("radio", { name: "NWUSD" }).click();
   await exposurePanel.locator("input").fill("75000");
   await exposurePanel.getByRole("button", { name: "Request exposure" }).click();
   await approveInPanel(page, "ui-permitted-exposure");
-  await waitOutcome(page, /Exposure recorded for NWUSD|Exposure blocked for NWUSD/, "ui-permitted-exposure", 8 * 60_000);
+  await waitOutcome(page, /Exposure recorded for NWUSD|Exposure blocked for NWUSD|Could not confirm/, "ui-permitted-exposure", 8 * 60_000);
   return finish();
 
   async function finish() {

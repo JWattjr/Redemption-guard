@@ -3,6 +3,7 @@
 import type { Assessment, Asset, Exposure, Policy, Status } from "@/lib/contract";
 import { STATUS_META } from "@/lib/contract";
 import { explorerAddress, explorerTx as explorerTxUrl } from "@/lib/config";
+import { AssetEmblem, GateArt, Icon, StatusIcon } from "./art";
 
 export function short(value: string, head = 6, tail = 4) {
   return value.length > head + tail + 1 ? `${value.slice(0, head)}…${value.slice(-tail)}` : value;
@@ -31,7 +32,7 @@ export function StatusBadge({ status, size = "md" }: { status: Status | ""; size
   const meta = STATUS_META[status];
   return (
     <span className={`badge badge--${meta.tone} badge--${size}`}>
-      <span className="badge__dot" aria-hidden />
+      <StatusIcon status={status} />
       {meta.label}
     </span>
   );
@@ -39,9 +40,10 @@ export function StatusBadge({ status, size = "md" }: { status: Status | ""; size
 
 export function ReasonCodes({ codes }: { codes: string[] }) {
   return (
-    <ul className="codes" aria-label="Reason codes">
+    <ul className="carts" aria-label="Reason codes">
       {codes.map((c) => (
-        <li key={c} className="code">
+        <li key={c} className="cart">
+          <span className="cart__notch" aria-hidden />
           {c}
         </li>
       ))}
@@ -61,17 +63,51 @@ export function EvidenceList({ assessment }: { assessment: Assessment }) {
             </a>
             <span className="evidence__tags">
               <span className={`tag ${s.authoritative ? "tag--ok" : "tag--muted"}`}>
+                <Icon name={s.authoritative ? "check" : "cross"} />
                 {s.authoritative ? "Registered issuer domain" : "Not an issuer domain"}
               </span>
               <span className={`tag ${s.fetch === "OK" ? "tag--muted" : "tag--warn"}`}>
+                <Icon name="node" />
                 {s.fetch === "OK" ? "Fetched by validators" : `Fetch: ${s.fetch}`}
               </span>
-              {supports && <span className="tag tag--ink">Cited as support</span>}
+              {supports && (
+                <span className="tag tag--ink">
+                  <Icon name="star" />
+                  Cited as support
+                </span>
+              )}
             </span>
           </li>
         );
       })}
     </ul>
+  );
+}
+
+/** The gate console: the signature status motif (graphic + icon + text). */
+export function GateConsole({
+  open,
+  tone,
+  note,
+  compact = false,
+}: {
+  open: boolean;
+  tone: string;
+  note: string;
+  compact?: boolean;
+}) {
+  return (
+    <div className={`console console--${open ? "open" : "closed"} console--${open ? "eligible" : tone}${compact ? " console--compact" : ""}`}>
+      <GateArt open={open} tone={open ? "eligible" : tone} />
+      <div className="console__text">
+        <span className="console__label">Exposure gate</span>
+        <span className="console__value">
+          <Icon name={open ? "open" : "lock"} />
+          {open ? "Open" : "Closed"}
+        </span>
+        <span className="console__note">{note}</span>
+      </div>
+    </div>
   );
 }
 
@@ -90,9 +126,19 @@ export function AssetCard({
   const open = asset.gate_open ?? asset.latest_status === "ELIGIBLE";
   const cooling = asset.latest_status === "ELIGIBLE" && !open && asset.gate_open_at;
   return (
-    <article className={`asset asset--${meta.tone} ${selected ? "asset--selected" : ""}`}>
+    <article
+      className={`asset asset--${meta.tone} asset--${asset.asset_id.toLowerCase()}${selected ? " asset--selected" : ""}`}
+      aria-label={`${asset.asset_id}${selected ? ", selected" : ""}`}
+    >
+      {selected && (
+        <span className="asset__flag">
+          <Icon name="star" />
+          Selected
+        </span>
+      )}
       <header className="asset__head">
-        <div>
+        <AssetEmblem assetId={asset.asset_id} />
+        <div className="asset__id">
           <div className="asset__ticker">{asset.asset_id}</div>
           <div className="asset__name">{asset.name}</div>
           <div className="asset__issuer">{asset.issuer}</div>
@@ -100,13 +146,11 @@ export function AssetCard({
         <StatusBadge status={asset.latest_status} size="lg" />
       </header>
 
-      <div className={`gate ${open ? "gate--open" : "gate--closed"}`}>
-        <span className="gate__label">Exposure gate</span>
-        <span className="gate__value">{open ? "Open" : "Closed"}</span>
-        <span className="gate__note">
-          {cooling ? `Gate re-opens at ${utcTime(asset.gate_open_at)}` : meta.gate}
-        </span>
-      </div>
+      <GateConsole
+        open={open}
+        tone={meta.tone}
+        note={cooling ? `Gate re-opens at ${utcTime(asset.gate_open_at)}` : meta.gate}
+      />
 
       {latest ? (
         <div className="asset__body">
@@ -134,8 +178,17 @@ export function AssetCard({
       )}
 
       <footer className="asset__foot">
-        <span className="muted">Issuer domain: {asset.authoritative_domains.join(", ")}</span>
-        <button type="button" className="btn btn--quiet" onClick={onSelect} aria-pressed={selected}>
+        <span className="asset__domain">
+          <span className="muted">Issuer domain</span>{" "}
+          <span className="mono break">{asset.authoritative_domains.join(", ")}</span>
+        </span>
+        <button
+          type="button"
+          className={`btn ${selected ? "btn--selected" : "btn--ghost"}`}
+          onClick={onSelect}
+          aria-pressed={selected}
+        >
+          {selected && <Icon name="check" />}
           {selected ? "Selected" : "Select asset"}
         </button>
       </footer>
@@ -145,11 +198,18 @@ export function AssetCard({
 
 export function PolicyPanel({ policy }: { policy?: Policy }) {
   return (
-    <section className="panel" aria-labelledby="policy-title">
+    <section className="panel panel--rulebook" aria-labelledby="policy-title">
       <div className="panel__head">
-        <h2 id="policy-title">Frozen policy</h2>
-        {policy && <span className="mono muted">{policy.policy_id}</span>}
+        <h2 id="policy-title" className="rail-title">
+          <Icon name="scroll" />
+          Frozen policy
+        </h2>
+        <span className="lockchip">
+          <Icon name="lock" />
+          Frozen
+        </span>
       </div>
+      {policy && <p className="policy__id mono">{policy.policy_id}</p>}
       <blockquote className="policy">
         {policy?.text ??
           "New exposure is eligible only when authoritative evidence clearly refers to the correct asset and indicates that ordinary redemptions remain operational. Return RESTRICTED when authoritative evidence reports an active suspension, material delay, broad restriction, or equivalent redemption impairment. Return INSUFFICIENT_EVIDENCE when sources are missing, ambiguous, stale, contradictory, non-authoritative, or cannot be tied confidently to the asset."}
@@ -175,9 +235,12 @@ export function PolicyPanel({ policy }: { policy?: Policy }) {
 
 export function ContractPanel({ address, owner }: { address: string; owner?: string }) {
   return (
-    <section className="panel" aria-labelledby="contract-title">
+    <section className="panel panel--idcard" aria-labelledby="contract-title">
       <div className="panel__head">
-        <h2 id="contract-title">Contract</h2>
+        <h2 id="contract-title" className="rail-title">
+          <Icon name="chip" />
+          Contract
+        </h2>
       </div>
       <dl className="facts facts--stack">
         <div>
@@ -220,11 +283,14 @@ export function Activity({ assessments, exposures }: { assessments: Assessment[]
   return (
     <section className="panel" aria-labelledby="activity-title">
       <div className="panel__head">
-        <h2 id="activity-title">On-chain activity</h2>
-        <span className="muted">{items.length ? `${items.length} records` : ""}</span>
+        <h2 id="activity-title" className="rail-title">
+          <Icon name="node" />
+          On-chain activity
+        </h2>
+        <span className="muted small">{items.length ? `${items.length} records` : ""}</span>
       </div>
       {items.length === 0 ? (
-        <p className="muted">No assessments or exposure requests recorded yet.</p>
+        <p className="empty">No assessments or exposure requests recorded yet.</p>
       ) : (
         <ol className="activity">
           {items.slice(0, 12).map((row) =>
@@ -271,48 +337,55 @@ type ProofFlow = {
 export function ProofPanel({ proof, contractAddress }: { proof: { contractAddress: string; generatedAt: string; flows: ProofFlow[] }; contractAddress: string }) {
   if (proof.contractAddress.toLowerCase() !== contractAddress.toLowerCase() || proof.flows.length === 0) return null;
   return (
-    <section className="panel" aria-labelledby="proof-title">
+    <section className="panel panel--receipts" aria-labelledby="proof-title">
       <div className="panel__head">
-        <h2 id="proof-title">Proof transactions</h2>
+        <h2 id="proof-title" className="section-title">Proof transactions</h2>
         <span className="muted small">Seeded {when(proof.generatedAt)} · re-read from chain</span>
       </div>
       <p className="panel__lede">
         The three reference flows, recorded by <code>npm run deploy:demo</code> against this contract. Blocked requests appear
         here because a reverted transaction leaves no contract state.
       </p>
-      <ol className="proofs">
-        {proof.flows.map((f) => {
+      <ol className="receipts">
+        {proof.flows.map((f, i) => {
           const agree = f.assess.votes ? Object.values(f.assess.votes).filter((v) => v === "agree").length : undefined;
           return (
-            <li key={f.assess.hash} className="proof">
-              <div className="proof__head">
-                <strong className="mono">{f.assetId}</strong>
+            <li key={f.assess.hash} className={`receipt ${f.exposureAllowed ? "receipt--ok" : "receipt--blocked"}`}>
+              <div className="receipt__head">
+                <span className="receipt__no" aria-hidden>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <strong className="receipt__ticker">{f.assetId}</strong>
                 <StatusBadge status={f.status as Status} />
-                <span className={`tag ${f.exposureAllowed ? "tag--ok" : "tag--warn"}`}>
+                <span className={`tag ${f.exposureAllowed ? "tag--ok" : "tag--bad"}`}>
+                  <Icon name={f.exposureAllowed ? "check" : "lock"} />
                   Exposure {f.exposureAllowed ? "recorded" : "blocked"}
                 </span>
               </div>
-              <dl className="proof__txs">
-                <div>
+              <dl className="receipt__txs">
+                <div className="receipt__leg">
                   <dt>Assessment #{f.assessmentId}</dt>
                   <dd>
-                    <a className="mono" href={explorerTxUrl(f.assess.hash)} target="_blank" rel="noreferrer noopener">
+                    <a className="mono hash" href={explorerTxUrl(f.assess.hash)} target="_blank" rel="noreferrer noopener">
                       {short(f.assess.hash, 10, 6)}
-                    </a>{" "}
-                    <span className="muted small">
+                    </a>
+                    <span className="receipt__meta">
                       {f.assess.executionResultName}
                       {f.assess.validators ? ` · ${agree ?? "?"}/${f.assess.validators} agree` : ""}
                     </span>
                   </dd>
                 </div>
-                <div>
+                <span className="receipt__route" aria-hidden>
+                  <Icon name="arrow" />
+                </span>
+                <div className="receipt__leg">
                   <dt>Exposure request</dt>
                   <dd>
-                    <a className="mono" href={explorerTxUrl(f.exposure.hash)} target="_blank" rel="noreferrer noopener">
+                    <a className="mono hash" href={explorerTxUrl(f.exposure.hash)} target="_blank" rel="noreferrer noopener">
                       {short(f.exposure.hash, 10, 6)}
-                    </a>{" "}
-                    <span className="muted small">{f.exposure.executionResultName}</span>
-                    {f.exposure.errorText && <div className="small text-restricted mono break">{f.exposure.errorText}</div>}
+                    </a>
+                    <span className="receipt__meta">{f.exposure.executionResultName}</span>
+                    {f.exposure.errorText && <code className="receipt__error">{f.exposure.errorText}</code>}
                   </dd>
                 </div>
               </dl>

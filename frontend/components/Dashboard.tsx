@@ -16,11 +16,13 @@ import { useWallet } from "@/lib/wallet";
 import { installRpcThrottle } from "@/lib/rpcThrottle";
 import proof from "@/lib/proof.generated.json";
 import { TxFlow, type TxRequest } from "./TxFlow";
+import { AssetEmblem, Guardian, Icon, StatusIcon } from "./art";
 import {
   Activity,
   AssetCard,
   ContractPanel,
   EvidenceList,
+  GateConsole,
   PolicyPanel,
   ProofPanel,
   ReasonCodes,
@@ -58,6 +60,8 @@ export default function Dashboard() {
   const [request, setRequest] = useState<TxRequest & { assetId: string; amountUnits?: string }>();
   const [outcome, setOutcome] = useState<Outcome>();
   const [faucetMsg, setFaucetMsg] = useState<string>();
+  // Incremented only after contract state confirms a good outcome; replays the guardian flourish once.
+  const [cheer, setCheer] = useState(0);
   const snapshotRef = useRef<{ latestId: number; exposures: number }>({ latestId: 0, exposures: 0 });
 
   const refresh = useCallback(async () => {
@@ -164,12 +168,18 @@ export default function Dashboard() {
         amountUnits: request.amountUnits,
       };
       setOutcome(base);
-      const [details, next] = await Promise.all([
+      const [details, first] = await Promise.all([
         tracked.genlayerTxId ? fetchTxDetails(tracked.genlayerTxId).catch(() => undefined) : undefined,
         refresh(),
       ]);
       let confirmation: Outcome["confirmation"] = "unconfirmed";
       let assessment: Assessment | undefined;
+      // A rate-limited read must not be reported as "no state change": try once more.
+      let next = first;
+      if (!next) {
+        await new Promise((r) => setTimeout(r, 8_000));
+        next = await refresh();
+      }
       if (next) {
         if (request.kind === "assess") {
           const a = next.assets.find((x) => x.asset_id === request.assetId);
@@ -185,6 +195,9 @@ export default function Dashboard() {
         }
       }
       setOutcome({ ...base, details, confirmation, assessment });
+      if (confirmation === "exposure-recorded" || (confirmation === "assessment-recorded" && assessment?.status === "ELIGIBLE")) {
+        setCheer((c) => c + 1);
+      }
     },
     [request, refresh],
   );
@@ -211,10 +224,16 @@ export default function Dashboard() {
     <div className="shell">
       <header className="topbar">
         <div className="brand">
-          <svg className="brand__mark" viewBox="0 0 32 32" aria-hidden>
-            <path d="M16 2 4 7v8c0 7.2 5 13.2 12 15 7-1.8 12-7.8 12-15V7L16 2Z" fill="none" stroke="currentColor" strokeWidth="2" />
-            <path d="M10 16h12" stroke="currentColor" strokeWidth="2" />
-          </svg>
+          <span key={cheer} className={`brand__sprite${cheer ? " brand__sprite--cheer" : ""}`}>
+            <Guardian />
+            {cheer > 0 && (
+              <span className="sparks" aria-hidden>
+                <Icon name="star" />
+                <Icon name="star" />
+                <Icon name="star" />
+              </span>
+            )}
+          </span>
           <div>
             <div className="brand__name">Redemption Guard</div>
             <div className="brand__tag">Consensus-gated stablecoin exposure</div>
@@ -223,10 +242,11 @@ export default function Dashboard() {
         <div className="topbar__right">
           <span className={`netbadge netbadge--${networkBadge.tone}`}>
             <span className="netbadge__dot" aria-hidden />
+            <span className="netbadge__env">Env</span>
             {networkBadge.text}
           </span>
           {!wallet.available ? (
-            <span className="muted small">No wallet detected</span>
+            <span className="walletnote">No wallet detected</span>
           ) : !wallet.address ? (
             <button type="button" className="btn btn--primary" onClick={wallet.connect} disabled={wallet.connecting}>
               {wallet.connecting ? "Connecting…" : "Connect wallet"}
@@ -237,6 +257,7 @@ export default function Dashboard() {
             </button>
           ) : (
             <span className="wallet mono" title={wallet.address}>
+              <span className="wallet__dot" aria-hidden />
               {short(wallet.address)}
             </span>
           )}
@@ -244,6 +265,9 @@ export default function Dashboard() {
       </header>
 
       <div className="disclosure" role="note">
+        <span className="disclosure__tab" aria-hidden>
+          Field notice
+        </span>
         <strong>Authorization prototype — not financial advice.</strong> No tokens move. NWUSD and HLUSD are fictional
         assets; the built-in evidence pages are labeled synthetic reviewer fixtures. Studio Next is a release-candidate
         network and may reset.
@@ -265,10 +289,22 @@ export default function Dashboard() {
         <div className="col col--main">
           <section aria-labelledby="assets-title">
             <div className="section-head">
-              <h1 id="assets-title">Monitored assets</h1>
+              <h1 id="assets-title" className="section-title">
+                <span className="section-title__kicker" aria-hidden>
+                  Territories
+                </span>
+                Monitored assets
+              </h1>
               <div className="section-head__meta">
                 {data && <span className="muted small">Read {new Date(data.fetchedAt).toLocaleTimeString()}</span>}
-                <button type="button" className="btn btn--ghost" onClick={refresh} disabled={refreshing}>
+                <button
+                  type="button"
+                  className={`btn btn--ghost btn--refresh${refreshing ? " is-busy" : ""}`}
+                  onClick={refresh}
+                  disabled={refreshing}
+                  aria-busy={refreshing}
+                >
+                  <Icon name="star" />
                   {refreshing ? "Refreshing…" : "Refresh"}
                 </button>
               </div>
@@ -302,10 +338,17 @@ export default function Dashboard() {
             </div>
           </section>
 
-          <div className="actions">
+          <div className="mission">
+            <span className="mission__route" aria-hidden>
+              <Icon name="arrow" />
+            </span>
             <section className="panel panel--action panel--assess" aria-labelledby="assess-title">
               <div className="panel__head">
-                <h2 id="assess-title">1 · Submit evidence</h2>
+                <h2 id="assess-title" className="step">
+                  <span className="step__num">1</span>
+                  <span className="step__sep">{" · "}</span>
+                  Submit evidence
+                </h2>
                 <AssetPicker
                   value={selected}
                   onChange={setSelected}
@@ -318,19 +361,20 @@ export default function Dashboard() {
                 status before it is written.
               </p>
               <div className="fixtures">
-                <span className="small muted">Synthetic fixtures:</span>
+                <span className="fixtures__label">Synthetic fixtures:</span>
                 {FIXTURES.map((f) => (
                   <button
                     key={f.key}
                     type="button"
-                    className="chip"
+                    className={`chip chip--${f.key}`}
                     title={f.hint}
                     onClick={() => {
                       setSelected(f.assetId);
                       setUrls([f.url]);
                     }}
                   >
-                    {f.label} <span className="muted">· {f.assetId}</span>
+                    <span className="chip__led" aria-hidden />
+                    {f.label} <span className="chip__asset">· {f.assetId}</span>
                   </button>
                 ))}
               </div>
@@ -357,7 +401,7 @@ export default function Dashboard() {
                         aria-label={`Remove URL ${i + 1}`}
                         onClick={() => setUrls(urls.filter((_, j) => j !== i))}
                       >
-                        ×
+                        <Icon name="cross" />
                       </button>
                     )}
                     {urlErrors[i] && <span className="fielderror">{urlErrors[i]}</span>}
@@ -371,7 +415,7 @@ export default function Dashboard() {
                   disabled={urls.length >= 3}
                   onClick={() => setUrls([...urls, ""])}
                 >
-                  Add URL ({urls.length}/3)
+                  + Add URL ({urls.length}/3)
                 </button>
                 <button
                   type="button"
@@ -383,12 +427,21 @@ export default function Dashboard() {
                   Run consensus assessment
                 </button>
               </div>
-              {assessDisabledReason && <p className="small muted right">{assessDisabledReason}</p>}
+              {assessDisabledReason && (
+                <p className="hint">
+                  <Icon name="lock" />
+                  {assessDisabledReason}
+                </p>
+              )}
             </section>
 
             <section className="panel panel--action panel--exposure" aria-labelledby="exposure-title">
               <div className="panel__head">
-                <h2 id="exposure-title">2 · Request exposure</h2>
+                <h2 id="exposure-title" className="step">
+                  <span className="step__num">2</span>
+                  <span className="step__sep">{" · "}</span>
+                  Request exposure
+                </h2>
                 <AssetPicker
                   value={selected}
                   onChange={setSelected}
@@ -401,15 +454,25 @@ export default function Dashboard() {
                 request; anything else reverts.
               </p>
               <div className="gatepreview">
-                <span className="small muted">Current gate for {selected}</span>
-                <StatusBadge status={asset?.latest_status ?? ""} />
-                <span className="small">
-                  {asset?.latest_status === "ELIGIBLE" && asset.gate_open === false && asset.gate_open_at
-                    ? "This ELIGIBLE assessment is cooling down. Gate re-opens at " + utcTime(asset.gate_open_at) + "."
-                    : asset?.latest_status === "ELIGIBLE"
-                    ? `Contract should record this request (assessment #${latest?.id}).`
-                    : "Contract should reject this request. Send it anyway to see the on-chain rejection."}
-                </span>
+                <div className="gatepreview__head">
+                  <span className="gatepreview__label">
+                    <AssetEmblem assetId={selected} />
+                    Current gate for {selected}
+                  </span>
+                  <StatusBadge status={asset?.latest_status ?? ""} />
+                </div>
+                <GateConsole
+                  compact
+                  open={Boolean(asset && (asset.gate_open ?? asset.latest_status === "ELIGIBLE"))}
+                  tone={STATUS_META[asset?.latest_status ?? ""].tone}
+                  note={
+                    asset?.latest_status === "ELIGIBLE" && asset.gate_open === false && asset.gate_open_at
+                      ? "This ELIGIBLE assessment is cooling down. Gate re-opens at " + utcTime(asset.gate_open_at) + "."
+                      : asset?.latest_status === "ELIGIBLE"
+                        ? `Contract should record this request (assessment #${latest?.id}).`
+                        : "Contract should reject this request. Send it anyway to see the on-chain rejection."
+                  }
+                />
               </div>
               <label className="field">
                 <span className="field__label">Amount (whole units)</span>
@@ -422,7 +485,7 @@ export default function Dashboard() {
                 />
               </label>
               <div className="panel__foot">
-                <span className="small muted">Authorization record only. No tokens move.</span>
+                <span className="footnote footnote--inline">Authorization record only. No tokens move.</span>
                 <button
                   type="button"
                   className="btn btn--primary"
@@ -433,7 +496,12 @@ export default function Dashboard() {
                   Request exposure
                 </button>
               </div>
-              {exposureDisabledReason && <p className="small muted right">{exposureDisabledReason}</p>}
+              {exposureDisabledReason && (
+                <p className="hint">
+                  <Icon name="lock" />
+                  {exposureDisabledReason}
+                </p>
+              )}
             </section>
           </div>
 
@@ -444,9 +512,14 @@ export default function Dashboard() {
           {wallet.address && wallet.onStudioNext && (
             <div className="faucet">
               <button type="button" className="btn btn--ghost" onClick={requestFunds}>
+                <Icon name="star" />
                 Get Studio Next test GEN for fees
               </button>
-              {faucetMsg && <span className="small muted">{faucetMsg}</span>}
+              {faucetMsg && (
+                <span className="small muted" role="status">
+                  {faucetMsg}
+                </span>
+              )}
             </div>
           )}
         </div>
@@ -528,6 +601,7 @@ function AssetPicker({
           className={`segmented__item ${value === id ? "is-active" : ""}`}
           onClick={() => onChange(id)}
         >
+          <AssetEmblem assetId={id} />
           {id}
         </button>
       ))}
@@ -571,8 +645,24 @@ function OutcomeCard({ outcome }: { outcome: Outcome }) {
 
   return (
     <section className={`panel outcome outcome--${tone}`} aria-live="polite" aria-labelledby="outcome-title">
+      <div className="outcome__eyebrow">Mission receipt</div>
       <div className="panel__head">
-        <h2 id="outcome-title">{headline}</h2>
+        <h2 id="outcome-title" className="outcome__title">
+          <span className="outcome__icon" aria-hidden>
+            {outcome.confirmation === "pending" ? (
+              <Icon name="node" />
+            ) : outcome.assessment ? (
+              <StatusIcon status={outcome.assessment.status} />
+            ) : outcome.confirmation === "exposure-recorded" ? (
+              <Icon name="check" />
+            ) : tone === "restricted" ? (
+              <Icon name="lock" />
+            ) : (
+              <Icon name="node" />
+            )}
+          </span>
+          {headline}
+        </h2>
         {outcome.assessment && <StatusBadge status={outcome.assessment.status} size="lg" />}
       </div>
 
